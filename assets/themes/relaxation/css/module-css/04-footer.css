@@ -1,0 +1,290 @@
+.footer-style-1 {
+    padding-top: 150px;
+    position: relative;
+    background: #0C1711;
+}
+.footer-style-2 {
+    padding-top: 80px;
+    position: relative;
+    background: #0C1711;
+}
+.logo-widget{
+    position: relative;
+}
+.logo-widget::after{
+    content: '';
+    width: 1px;
+    height: 107px;
+    background: linear-gradient(91deg, #292727 -84.49%, rgba(75, 75, 75, 0.00) 134.87%);
+    position: absolute;
+    right: -30px;
+    top: 20px;
+}
+.footer-logo{
+    margin-bottom: 19px;
+}
+.footer-location .location, .footer-location .hot-line{
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin-bottom: 16px;
+}
+.footer-location .icon {
+    font-size: 14px;
+    color: var(--white-color);
+}
+
+.footer-location p{
+    color: #F9F3F3;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 26px;
+}
+.footer-location p a{
+    color: var(--secondary-color);
+}
+.footer-location p a:hover{
+    color: var(--white-color);
+}
+.link-widget-1 h6{
+    position: relative;
+    display: inline;
+    color: var(--white-color);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 32px;
+    padding-bottom: 5px;
+}
+.link-widget-1 h6:before{
+    content: '';
+    width: 60%;
+    height: 1px ;
+    background-color: var(--secondary-color);
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+.link-widget-1 ul{
+    margin-top: 15px;
+}
+.link-widget-1 ul li{
+    margin-bottom: 5px;
+}
+ul.link-widget-1-list a {
+    position: relative;
+    color: #F9F3F3;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+    padding-left: 15px;
+}
+ul.link-widget-1-list a:before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    position: absolute;
+    left: 0;
+    top: 5px;
+}
+ul.link-widget-1-list a:hover {
+    color: var(--secondary-color);
+}
+.footer-media ul{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 40px;
+}
+.footer-media ul li a{
+    color: var(--white-color);
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 1px solid var(--white-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: 0.5s;
+}
+.footer-media ul li a .icon-x-twitter{
+    font-size: 8px;
+}
+.footer-media ul li a:hover{
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    border: 1px solid transparent;
+}
+.help-widget {
+    margin-left: -80px;
+}
+
+.pyment-widget {
+    position: relative;
+    float: right;
+}
+.pyment-widget::after {
+    content: '';
+    width: 1px;
+    height: 107px;
+    background: linear-gradient(91deg, #292727 -84.49%, rgba(75, 75, 75, 0.00) 134.87%);
+    position: absolute;
+    left: -145px;
+    top: 20px;
+}
+.footer-pyment p{
+    max-width: 176px;
+    color: var(--white-color);
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+    margin: 15px 0 40px;
+}
+.bank-card{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.footer-copyright{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 17px;
+    padding: 17px 0;
+    border-top: 1px solid #403E3E;
+}
+.copyright-text, .copyright-navigation li a{
+    color: #858585;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+}
+.copyright-navigation li a:hover{
+    color: var(--secondary-color);
+}
+.footer-copyright .copyright-navigation{
+    display: flex;
+    align-items: center;
+    gap: 57px;
+}
+
+/* ----------------------------------------
+Responsive
+------------------------------------------- */
+/* Large screen  */
+@media only screen and (min-width: 1200px) and (max-width: 1319px) {
+    .footer-style-1 {
+        padding-top: 130px;
+    }
+}
+
+/* Medium screen  */
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .footer-style-1 {
+        padding-top: 130px;
+    }
+    .footer-location {
+        margin-right: 0;
+    }
+    .destination-widget {
+        margin-left: 25px;
+    }
+    .useful-widget {
+        margin-left: 32px;
+    }
+    .logo-widget::after, .pyment-widget::after{
+        display: none;
+    }
+    .help-widget {
+        margin-left: -40px;
+    }
+
+}
+
+/* Tablet Layout: 768px. */
+@media only screen and (min-width: 768px) and (max-width: 991px){
+    .footer-style-1 {
+        padding-top: 90px;
+    }
+    .link-widget-1{
+        margin-top: 50px;
+    }
+    .footer-media ul {
+        margin-top: 20px;
+    }
+    .footer-location .location, .footer-location .hot-line {
+        margin-bottom: 0;
+    }
+    .help-widget {
+        margin-left: 0;
+    }
+    .pyment-widget {
+        float: left;
+    }
+    .footer-style-1 .justify-content-center {
+        justify-content: start !important;
+    }
+    .footer-style-1 .justify-content-end {
+        justify-content: start !important;
+    }
+
+
+}
+
+
+/* Mobile Layout: 320px. */
+@media only screen and (max-width: 767px){
+    .footer-style-1 {
+        padding-top: 90px;
+    }
+    .link-widget-1{
+        margin-top: 30px;
+    }
+    .footer-media ul {
+        margin-top: 20px;
+    }
+    .footer-location .location, .footer-location .hot-line {
+        margin-bottom: 0;
+    }
+    .destination-widget {
+        margin-left: 0px;
+    }
+    .help-widget {
+        margin-left: 0;
+    }
+    .pyment-widget {
+        float: left;
+    }
+    .pyment-widget {
+        padding-left: 0px;
+    }
+    .footer-style-1 .justify-content-center {
+        justify-content: start !important;
+    }
+    .footer-style-1 .justify-content-end {
+        justify-content: start !important;
+    }
+
+    /* copyright */
+    .footer-copyright {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .footer-copyright .copyright-navigation {
+        gap: 17px;
+    }
+}
+
+.footer-logo a img{
+    height: 60px;
+}
+/* ----------------------------------------
+Responsive
+------------------------------------------- */

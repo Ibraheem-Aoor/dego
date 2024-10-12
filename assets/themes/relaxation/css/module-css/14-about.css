@@ -1,0 +1,223 @@
+.about{
+    padding: 120px 0 120px;
+}
+.about-shape{
+    position: absolute;
+    right: 0;
+    bottom: 150px;
+    z-index: -1;
+}
+.about .common-title{
+    margin-bottom: 0;
+}
+.about .common-title h2{
+    max-width: 709px;
+}
+.about .common-title p{
+    max-width: 735px;
+    margin-top: 40px;
+    font-size: 20px;
+    line-height: 28px;
+}
+.about-left-container{
+    margin-top: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.about-contant{
+    max-width: 263px;
+}
+.about-contant a{
+    color: var(--text-color-1);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 28px;
+    margin: 24px 0 16px;
+}
+.about-contant-inner{
+    margin-bottom: 40px;
+}
+.about-contant-inner .icon img{
+    transition: 0.5s;
+}
+.about-contant-inner:hover .icon img{
+    transform: scale(1.1);
+}
+
+.about-right-content{
+    position: relative;
+}
+.about-right-image{
+    margin-left: 55px;
+}
+.round-border-shape {
+    position: absolute;
+    top: -65px;
+    right: -13px;
+    width: 279px;
+    height: 279px;
+    border-radius: 50%;
+    border: 17px solid var(--tertiary-color);
+    z-index: -1;
+    animation: bunch 2s infinite ease-in-out alternate;
+}
+@keyframes bunch {
+    0% {
+        transform: scale(1) rotate(0deg);
+        border: 17px solid var(--tertiary-color);
+    }
+    100% {
+        transform: scale(1.1) rotate(360deg);
+        border: 22px solid var(--tertiary-color);
+    }
+}
+.squir-shape {
+    position: absolute;
+    left: 35px;
+    bottom: -20px;
+    width: 128px;
+    height: 97px;
+    border-radius: 16px;
+    border: 10px solid #FF8E3F;
+    background: #FF8E3F;
+    z-index: -1;
+    animation: zoomInStable 5s linear infinite alternate;
+}
+
+
+/* --------------------------------------------------
+about 3
+---------------------------------------------------- */
+.about-3{
+    padding: 120px 0 120px;
+}
+.about-3-left-content {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+.about-3-left-content p{
+    color: var(--text-color-2);
+    font-size: 18px;
+    line-height: 28px;
+    margin: 24px 0 32px;
+    margin-right: 38px;
+}
+.about-3-left-content a{
+    text-transform: capitalize;
+}
+.about-3-right-content {
+    position: relative;
+    padding-left: 50px;
+}
+.about-3-right-content .image-2{
+    position: absolute;
+    right: 0;
+    bottom: -25px;
+}
+.about-3-right-frem{
+    position: absolute;
+    left: 0;
+    bottom: 35px;
+    transform: translateY(11px);
+    transform: rotate(-10.998deg);
+
+    width: 165px;
+    height: 165px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.about-3-right-frem-inner{
+    text-align: center;
+}
+.about-3-right-frem-inner h5{
+    color: var(--white-color);
+    font-size: 44.084px;
+    font-weight: 600;
+    line-height: 49.594px;
+}
+.about-3-right-frem-inner p{
+    color: var(--white-color);
+    font-size: 22.042px;
+    font-weight: 500;
+    line-height: 27.552px;
+}
+/* --------------------------------------------------
+about 3
+---------------------------------------------------- */
+
+
+/* -----------------------------------------------
+Responsive
+------------------------------------------------ */
+/* Medium screen  */
+@media only screen and (min-width: 992px) and (max-width: 1199px){
+    .about {
+        padding: 100px 0 50px;
+    }
+    .about-contant {
+        max-width: 230px;
+    }
+
+    .about-3 {
+        padding: 100px 0 100px;
+    }
+    .about-3-left-content p {
+        font-size: 16px;
+        margin-right: 0;
+    }
+    .about-3-left-content h3 {
+        font-size: 34px;
+        line-height: 47px;
+    }
+}
+
+/* Tablet Layout: 768px. */
+@media only screen and (min-width: 768px) and (max-width: 991px){
+    .about-3 {
+        padding: 80px 0 100px;
+    }
+    .about-3-left-content h3{
+        font-size: 32px;
+    }
+    .about-3-left-content {
+        margin-bottom: 50px;
+    }
+}
+
+
+/* Mobile Layout: 320px. */
+@media only screen and (max-width: 767px){
+    .about {
+        padding: 90px 0 100px;
+    }
+    .about-left-container {
+        margin-top: 30px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .about-right-image {
+        margin-left: 0;
+    }
+    .round-border-shape {
+        top: -45px;
+    }
+    .squir-shape {
+        left: -3px;
+        bottom: -20px;
+    }
+
+    .about-3 {
+        padding: 50px 0 100px;
+    }
+    .about-3-left-content {
+        margin-bottom: 50px;
+    }
+}
+/* -----------------------------------------------
+Responsive
+------------------------------------------------ */

@@ -1,0 +1,57 @@
+.book{
+    margin-top: 82px;
+    padding: 38px 0 99px;
+}
+.book-single{
+    text-align: center;
+}
+.book-single-title a{
+    color: var(--text-color-1);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 32px;
+    margin: 24px 0 12px;
+}
+.book-single-image img{
+    transition: 0.5s;
+}
+.book-single:hover .book-single-image img{
+    transform: scale(1.1);
+}
+
+
+/* -----------------------------------------------
+Responsive
+------------------------------------------------ */
+/* Medium screen  */
+@media only screen and (min-width: 992px) and (max-width: 1199px){
+
+}
+
+/* Tablet Layout: 768px. */
+@media only screen and (min-width: 768px) and (max-width: 991px){
+    .book {
+        margin-top: 82px;
+        padding: 0px 0 50px;
+    }
+    .book-single{
+        margin-bottom: 50px;
+    }
+}
+
+/* Mobile Layout: 320px. */
+@media only screen and (max-width: 767px){
+    .book {
+        margin-top: 82px;
+        padding: 0px 0 50px;
+    }
+    .book .bg-layer{
+        background-size: contain !important;
+    }
+    .book-single{
+        margin-bottom: 50px;
+    }
+}
+/* -----------------------------------------------
+Responsive
+------------------------------------------------ */

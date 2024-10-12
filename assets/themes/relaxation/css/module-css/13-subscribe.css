@@ -1,0 +1,306 @@
+.sabscribe{
+    padding-top: 120px;
+    z-index: 1;
+}
+.sabscribe-container {
+    position: relative;
+    max-width: 1196px;
+    height: 360px;
+    border-radius: 24px;
+    padding: 108px 40px 0;
+    margin: 0 auto;
+    margin-bottom: -70px;
+    z-index: 1;
+}
+.sabscribe-container .bg-layer{
+    border-radius: 24px;
+}
+.sabscribe-content{
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+.sabscribe-title h6{
+    color: var(--text-color-1);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    margin-bottom: 16px;
+}
+.sabscribe-title h4{
+    max-width: 540px;
+    color: var(--white-color);
+}
+.sabscribe-form {
+    max-width: 430px;
+    width: 100%;
+}
+.sabscribe-form input{
+    max-width: 309px;
+    width: 100%;
+    padding: 17px 16px 17px 44px;
+    border-radius: 12px 0px 0px 12px;
+    background: var(--white-color);
+}
+.sabscribe-form input::placeholder{
+    color: #767878;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+}
+.sabscribe-form form {
+    position: relative;
+    display: flex;
+}
+.sabscribe-form form .fa-envelopes{
+    position: absolute;
+    left: 16px;
+    top: 23px;
+    color: #767878;
+    font-size: 16px;
+    font-weight: 400;
+}
+.sabscribe-form form button {
+    padding: 23px 16px 21px 16px;
+    border-radius: 0px 12px 12px 0px;
+    background: var(--secondary-color);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    color: var(--white-color);
+    margin-left: -6px;
+    transition: 0.5s;
+}
+.sabscribe-form form button i{
+    font-size: 20px;
+}
+.sabscribe-form form button:hover{
+    background: var(--praimary-color);
+}
+
+/* --------------------------------------------------
+sabscribe-2
+--------------------------------------------------- */
+.sabscribe-2{
+    padding-top: 120px;
+    z-index: 1;
+}
+.sabscribe-3 {
+    padding-top: 90px;
+    z-index: 1;
+}
+.sabscribe-2-container {
+    position: relative;
+    width: 100%;
+    height: 313px;
+    border-radius: 24px;
+    padding: 80px 69px 0;
+    margin: 0 auto;
+    margin-bottom: -70px;
+    z-index: 1;
+}
+.sabscribe-2-container  .sabscribe-title{
+    max-width: 486px;
+    width: 100%;
+}
+.sabscribe-2-container  .sabscribe-title h4{
+    max-width: 435px;
+    margin-bottom: 15px;
+    color: var(--text-color-1);
+}
+.sabscribe-2-container  .sabscribe-title h6{
+    color: var(--text-color-2);
+    font-size: 14px;
+}
+.sabscribe-2-container .sabscribe-form input{
+    max-width: 309px;
+    width: 100%;
+}
+/* --------------------------------------------------
+sabscribe-2
+--------------------------------------------------- */
+
+
+/* --------------------------------------------------
+responsive
+--------------------------------------------------- */
+/* Large screen  */
+@media only screen and (min-width: 1200px) and (max-width: 1319px) {
+    .sabscribe-2-container .bg-layer {
+        background-size: contain !important;
+    }
+    .sabscribe-2-container {
+        padding: 60px 40px 0;
+        height: 272px;
+    }
+}
+
+
+/* Medium screen  */
+@media only screen and (min-width: 992px) and (max-width: 1199px){
+    .sabscribe-title h4 {
+        max-width: 450px;
+    }
+
+    .sabscribe-2 .bg-layer {
+        background-size: 100% !important;
+    }
+    .sabscribe-2-container {
+        padding: 30px 20px 0;
+        height: 217px;
+    }
+    .sabscribe-2-container  .sabscribe-title {
+        max-width: 329px;
+    }
+    .sabscribe-title h4{
+        font-size: 30px;
+        line-height: 34px;
+    }
+    .sabscribe-2-container .sabscribe-form {
+        max-width: 379px;
+    }
+    .sabscribe-2-container .sabscribe-form input {
+        max-width: 258px;
+    }
+    .sabscribe-2-container .sabscribe-title h6{
+        margin-bottom: 0;
+    }
+
+    .sabscribe-3 {
+        padding-top: 60px;
+    }
+}
+
+/* Tablet Layout: 768px. */
+@media only screen and (min-width: 768px) and (max-width: 991px){
+    .sabscribe-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .sabscribe-container {
+        padding: 65px 40px 0;
+    }
+    .sabscribe-form {
+        width: 100%;
+    }
+    .sabscribe-form form {
+        position: relative;
+        display: inline-flex;
+        width: 100%;
+    }
+    .sabscribe-form input {
+        max-width: 100%;
+        width: 100%;
+        font-size: 14px;
+    }
+    .sabscribe-form form button {
+        padding: 25px 29px 23px 27px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* subscribe 2 */
+    .sabscribe-2 {
+        padding-top: 100px;
+        z-index: 1;
+    }
+    .sabscribe-2 .bg-layer {
+        background-size: 100% !important;
+    }
+    .sabscribe-2-container {
+        padding: 30px 20px 0;
+        height: 193px;
+    }
+    .sabscribe-2 .sabscribe-content {
+        gap: 0;
+    }
+    .sabscribe-2-container  .sabscribe-title {
+        max-width: 100%;
+    }
+    .sabscribe-2-container  .sabscribe-title h4 {
+        max-width: 100%;
+        font-size: 22px;
+        line-height: 28px;
+        margin-bottom: 25px;
+    }
+    .sabscribe-2-container .sabscribe-title h6{
+        display: none;
+    }
+
+    .sabscribe-3 {
+        padding-top: 60px;
+    }
+
+}
+
+/* Mobile Layout: 320px. */
+@media only screen and (min-width: 320px) and (max-width: 767px){
+    .sabscribe-container {
+        padding: 65px 10px 0;
+    }
+    .sabscribe-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .sabscribe-form {
+        width: 100%;
+    }
+    .sabscribe-form form {
+        position: relative;
+        display: inline-flex;
+        width: 100%;
+    }
+    .sabscribe-form input {
+        max-width: 100%;
+        width: 100%;
+        font-size: 14px;
+    }
+    .sabscribe-title h4{
+        font-size: 24px;
+        line-height: 36px;
+    }
+    .sabscribe-form form button span{
+        display: none;
+    }
+    .sabscribe-form form button {
+        padding: 15px 16px 10px 16px;
+        margin-left: 0;
+    }
+    .sabscribe-form form .fa-envelopes {
+        left: 16px;
+        top: 16px;
+    }
+
+     /* subscribe 2 */
+     .sabscribe-2 {
+        padding-top: 80px;
+    }
+     .sabscribe-2 .sabscribe-content {
+        gap: 0;
+    }
+    .sabscribe-2-container {
+        padding: 35px 20px 0;
+        border-radius: 30px;
+    }
+    .sabscribe-2-container .bg-layer{
+        border-radius: 30px;
+    }
+    .sabscribe-2-container  .sabscribe-title {
+        max-width: 100%;
+    }
+    .sabscribe-2-container  .sabscribe-title h4 {
+        max-width: 100%;
+        font-size: 26px;
+        line-height: 34px;
+    }
+
+    .sabscribe-3 {
+        padding-top: 60px;
+    }
+}
+/* --------------------------------------------------
+responsive
+--------------------------------------------------- */

@@ -1,0 +1,89 @@
+.inspiration {
+    padding: 100px 0 90px;
+    background: var(--bg-4);
+}
+.inspiration-2{
+    padding: 120px 0 20px;
+}
+.inspiration-bg{
+    position: absolute;
+    bottom: 0;
+    z-index: -1;
+}
+.inspiration .common-title{
+    position: relative;
+    max-width: 515px;
+    margin-bottom: 24px;
+    padding-top: 80px;
+}
+.web{
+    position: absolute;
+    right: 40%;
+    bottom: 0;
+    animation: lightSpeedOut 5s linear infinite;
+}
+.inspiration-left-content{
+    position: relative;
+}
+.inspiration-left-content .bird {
+    position: absolute;
+    right: 250px;
+    bottom: 50px;
+    animation: flipOutY  3s linear infinite alternate;
+}
+.inspiration-left-content p{
+    max-width: 490px;
+    margin-bottom: 48px;
+}
+.inspiration-btn .btn-1 {
+    color: var(--white-color);
+    padding: 20px 60px;
+    border-radius: 35px;
+    background-color: var(--secondary-color);
+    font-size: 18px;
+    font-weight: 500;
+}
+.inspiration-btn .btn-1 span{
+    background-color: var(--praimary-color);
+}
+.inspiration-right-content{
+    position: relative;
+}
+.inspiration-right-content .image{
+    position: absolute;
+    bottom: 0;
+}
+
+
+/* -----------------------------------------------
+Responsive
+------------------------------------------------ */
+/* Medium screen  */
+@media only screen and (min-width: 992px) and (max-width: 1199px){
+    
+}
+
+/* Tablet Layout: 768px. */
+@media only screen and (min-width: 768px) and (max-width: 991px){
+    .inspiration {
+        padding: 0px 0 90px;
+        background: var(--bg-4);
+    }
+    .inspiration-2{
+        padding: 0px 0 0px;
+    }
+}
+
+/* Mobile Layout: 320px. */
+@media only screen and (max-width: 767px){
+    .inspiration {
+        padding: 0px 0 90px;
+        background: var(--bg-4);
+    }
+    .inspiration-2{
+        padding: 0px 0 20px;
+    }
+}
+/* -----------------------------------------------
+Responsive
+------------------------------------------------ */

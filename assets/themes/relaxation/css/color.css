@@ -1,0 +1,64 @@
+/* Default Color File  */
+
+
+
+:root {
+
+    /* praimary color */
+    --praimary-color: #033f1b;
+    --praimary-color-grb: 3, 63, 27;
+
+    --border-color1: #e5e7eb;
+    --border-color2: #F2EFDF70;
+
+
+    /* secondary color*/
+    --secondary-color: #ff8e3f;
+
+    /* Tertiary color */
+    --tertiary-color: #f9e36a;
+
+    /* text-color 1 */
+    --text-color-1: #0d2416;
+
+    /* text-color 2 */
+    --text-color-2: #304137;
+
+    /* white color */
+    --white-color: #ffffff;
+    --white-color-rgb: 255, 255, 255;
+
+    /* Bg 1 */
+    --bg-1: #F3FAF7;
+
+    /* Bg 2 */
+    --bg-2: #F9FEF9;
+
+    /* Bg 3 */
+    --bg-3: #F7FBFD;
+
+    /* Bg 4 */
+    --bg-4: #F9F8F7;
+
+    /* card bg 1 */
+    --card-1: #F6F4F0;
+
+    /* card bg 2 */
+    --card-2: #EAFAFF;
+
+
+    /* Shadow 1 */
+    --shadow-1: 2px 1px 28.7px -2px rgba(155, 155, 155, 0.15);
+
+}
+
+
+
+
+
+
+
+
+
+
+

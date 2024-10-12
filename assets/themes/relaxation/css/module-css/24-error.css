@@ -1,0 +1,30 @@
+.error{
+    padding: 120px 0 0;
+}
+.error-image{
+    margin-left: 90px;
+}
+.error-content p{
+    margin-top: 20px;
+    margin-bottom: 40px;
+    font-size: 18px;
+}
+.error-content a{
+    border: 1px solid var(--praimary-color);
+    color: var(--praimary-color);
+    text-transform: capitalize;
+}
+.error-content a:hover{
+    border: 1px solid var(--secondary-color);
+}
+
+
+/* Mobile Layout: 320px. */
+@media only screen and (max-width: 767px){
+    .error {
+        padding: 80px 0 0;
+    }
+    .error-image {
+        margin-left: 25px;
+    }
+}

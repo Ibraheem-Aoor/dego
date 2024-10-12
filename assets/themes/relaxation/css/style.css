@@ -1,0 +1,48 @@
+
+@import url('module-css/01-header.css');
+@import url('module-css/02-mobile-menu.css');
+@import url('module-css/03-banner.css');
+@import url('module-css/04-footer.css');
+@import url('module-css/05-search.css');
+@import url('module-css/06-destination.css');
+@import url('module-css/07-book.css');
+@import url('module-css/08-experience.css');
+@import url('module-css/09-popular.css');
+@import url('module-css/10-inspiration.css');
+@import url('module-css/11-testimonial.css');
+@import url('module-css/12-blog.css');
+@import url('module-css/13-subscribe.css');
+@import url('module-css/14-about.css');
+@import url('module-css/15-adventure.css');
+@import url('module-css/16-app.css');
+@import url('module-css/17-counter-section.css');
+@import url('module-css/18-mission.css');
+@import url('module-css/19-team.css');
+@import url('module-css/20-faq.css');
+@import url('module-css/21-package.css');
+@import url('module-css/22-contact.css');
+@import url('module-css/23-terms.css');
+@import url('module-css/24-error.css');
+@import url('module-css/25-sign-in.css');
+
+/*  */
+@import url('01-global.css');
+@import url('color.css');
+@import url('responsive.css');
+@import url('all.min.css');
+@import url('fancy-box-carusol.css');
+@import url('flaticon.css');
+@import url('animate.css');
+@import url('icomoon.css');
+@import url('jquery.fancybox.min.css');
+@import url('swiper.min.css');
+@import url('rtl.css');
+@import url('elpath.css');
+@import url('select2.min.css');
+@import url('flatpickr-min.css');
+@import url('odometer-theme-default.css');
+@import url('owl.css');
+@import url('magnific-popup.css');
+@import url('intlTelInput.min.css');
+
+

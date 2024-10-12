@@ -1,0 +1,134 @@
+.mission{
+    padding: 60px 0 60px;
+    background-color: var(--bg-2);
+}
+.mission-title p{
+    margin-top: 24px;
+}
+.mission-title{
+    margin-top: 55px;
+    margin-bottom: 147px;
+}
+.mission-title:last-child{
+    margin-bottom: 0;
+}
+.mission-right-container{
+    position: relative;
+}
+.mission-right-image{
+    margin-bottom: 46px;
+}
+.mission-right-image:last-child{
+    margin-bottom: 0;
+}
+
+/* round text */
+.round-box-content {
+    position: absolute;
+    bottom: 42%;
+    left: 0;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background-color: var(--tertiary-color);
+    text-align: center;
+    filter: drop-shadow(0px 10px 70px rgba(0, 0, 0, 0.08));
+}
+.round-box-content .inner-icon {
+    position: absolute;
+    top: 44px;
+    left: 45px;
+    font-size: 26px;
+}
+.round-box-content .curved-circle {
+    font-size: 16px;
+    line-height: 26px;
+    font-family: "Inter", sans-serif;
+    color: var(--text-color-1);
+    font-weight: 500;
+    text-align: center;
+    width: 65px;
+    height: 65px;
+    top: 0px;
+    left: 22px;
+    transition: .7s;
+}
+/* round text */
+
+
+/* -----------------------------------------------
+Responsive
+------------------------------------------------ */
+/* Large screen  */
+@media only screen and (min-width: 1200px) and (max-width: 1319px) {
+    .mission-title {
+        margin-bottom: 115px;
+    }
+    .round-box-content {
+        bottom: 42%;
+        left: -10px;
+    }
+
+}
+
+/* Medium screen  */
+@media only screen and (min-width: 992px) and (max-width: 1199px){
+    .mission {
+        padding: 60px 0 20px;
+    }
+    .mission-title {
+        margin-top: 0;
+        margin-bottom: 80px;
+    }
+    .mission-title h4{
+        font-size: 28px;
+        line-height: 36px;
+    }
+    .mission-title p {
+        margin-top: 15px;
+    }
+    .round-box-content {
+        bottom: 39%;
+        left: -33px;
+    }
+}
+
+/* Tablet Layout: 768px. */
+@media only screen and (min-width: 768px) and (max-width: 991px){
+    .mission-title {
+        margin-top: 25px;
+        margin-bottom: 30px;
+    }
+    .mission-title h4{
+        font-size: 32px;
+    }
+    .mission-title p {
+        margin-top: 10px;
+    }
+    .mission-right-container {
+        margin-top: 50px;
+    }
+}
+
+/* Mobile Layout: 320px. */
+@media only screen and (max-width: 767px){
+    .mission-title {
+        margin-top: 25px;
+        margin-bottom: 30px;
+    }
+    .mission-title h4{
+        font-size: 26px;
+    }
+    .mission-title p {
+        margin-top: 10px;
+    }
+    .mission-right-container {
+        margin-top: 50px;
+    }
+    .round-box-content {
+        bottom: 35%;
+    }
+}
+/* -----------------------------------------------
+Responsive
+------------------------------------------------ */

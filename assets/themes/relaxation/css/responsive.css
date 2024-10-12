@@ -1,0 +1,110 @@
+@media only screen and (max-width: 7000px){
+	.page-wrapper{
+		overflow: hidden;
+	}
+}
+
+@media only screen and (max-width: 1500px){
+
+}
+
+@media (min-width:1400px){
+	
+}
+
+@media only screen and (max-width: 1400px){
+
+}
+
+@media only screen and (max-width: 1350px){
+	.common-title h2 {
+        font-size: 38px;
+        line-height: 50px;
+    }
+}
+
+/* Large screen  */
+@media only screen and (min-width: 1200px) and (max-width: 1319px) {
+
+}
+
+@media only screen and (max-width: 1200px){
+	.common-title h2 {
+		font-size: 32px;
+		line-height: 39px;
+	}
+	.center-title h6 {
+		margin-bottom: 10px;
+	}
+
+	.common-title-2 h2 {
+		font-size: 32px;
+		line-height: 50px;
+	}
+
+}
+
+/* Medium screen  */
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+
+}
+
+@media only screen and (max-width: 991px){
+
+} 
+
+@media only screen and (min-width: 768px){
+
+}
+
+/* Tablet Layout: 768px. */
+@media only screen and (min-width: 768px) and (max-width: 991px){
+
+}
+
+/* Mobile Layout: 320px. */
+@media only screen and (max-width: 767px){
+	.common-title h2 {
+		font-size: 22px;
+		line-height: 34px;
+	}
+
+	h3, .h3 {
+		font-size: 28px;
+		font-weight: 600;
+		line-height: 40px;
+	}
+
+	.paigination ul {
+		gap: 8px;
+	}
+	.paigination ul li a {
+		font-size: 16px;
+		width: 40px;
+		height: 40px;
+	}
+
+	.prgoress_indicator {
+		right: 10px;
+		bottom: 10px;
+	}
+
+}
+
+@media only screen and (max-width: 575px){
+	
+}
+
+@media only screen and (max-width: 400px){
+	.scroll-to-top {
+		display: none;
+	}
+}
+
+
+
+
+
+
+
+
