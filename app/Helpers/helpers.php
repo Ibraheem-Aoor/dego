@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use App\Models\Language;
 use App\Models\PageDetail;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,7 +22,8 @@ if (!function_exists('template')) {
         if (request()->has('home_version')) {
             $homeVersion = request()->home_version;
         }
-        if ($asset) return 'assets/themes/' . $activeTheme . '/';
+        if ($asset)
+            return 'assets/themes/' . $activeTheme . '/';
         return 'themes.' . $activeTheme . '.';
     }
 }
@@ -132,7 +134,7 @@ if (!function_exists('basicControl')) {
 
             return $configure;
         } catch (\Exception $e) {
-//            die("Unable to establish a connection to the database. Please check your connection settings and try again later");
+            //            die("Unable to establish a connection to the database. Please check your connection settings and try again later");
         }
     }
 }
@@ -237,7 +239,7 @@ if (!function_exists('getFile')) {
         $default = ($upload == true) ? asset(config('filelocation.default2')) : asset(config('filelocation.default'));
         try {
             if ($disk == 'local') {
-                    $localImage = asset('/assets/upload') . '/' . $image;
+                $localImage = asset('/assets/upload') . '/' . $image;
                 return !empty($image) && Storage::disk($disk)->exists($image) ? $localImage : $default;
             } else {
                 return !empty($image) && Storage::disk($disk)->exists($image) ? Storage::disk($disk)->url($image) : $default;
@@ -489,14 +491,16 @@ if (!function_exists('fractionNumber')) {
 function hextorgb($hexstring)
 {
     $integar = hexdec($hexstring);
-    return array("red" => 0xFF & ($integar >> 0x10),
+    return array(
+        "red" => 0xFF & ($integar >> 0x10),
         "green" => 0xFF & ($integar >> 0x8),
-        "blue" => 0xFF & $integar);
+        "blue" => 0xFF & $integar
+    );
 }
 
 function renderCaptCha($rand)
 {
-//    session_start();
+    //    session_start();
     $captcha_code = '';
     $captcha_image_height = 50;
     $captcha_image_width = 130;
@@ -516,7 +520,8 @@ function renderCaptCha($rand)
         $captcha_code .= substr(
             $possible_captcha_letters,
             mt_rand(0, strlen($possible_captcha_letters) - 1),
-            1);
+            1
+        );
         $count++;
     }
 
@@ -596,7 +601,7 @@ function renderCaptCha($rand)
     );
 
     /* Show captcha image in the html page */
-// defining the image type to be shown in browser widow
+    // defining the image type to be shown in browser widow
     header('Content-Type: image/jpeg');
     imagejpeg($captcha_image); //showing the image
     imagedestroy($captcha_image); //destroying the image instance
@@ -607,7 +612,7 @@ function renderCaptCha($rand)
 
 function getIpInfo()
 {
-//	$ip = '210.1.246.42';
+    //	$ip = '210.1.246.42';
     $ip = null;
     $deep_detect = TRUE;
 
@@ -704,7 +709,7 @@ if (!function_exists('convertRate')) {
         if ($rate) {
             $convertRate = $rate->$currencyCode;
         }
-        return (float)$convertRate;
+        return (float) $convertRate;
     }
 }
 if (!function_exists('stringToRouteName')) {
@@ -728,7 +733,8 @@ function browserIcon($string)
         'Maxthon' => 'maxthon',
         'Konqueror' => 'unknown',
         'UC Browser' => 'ucBrowser',
-        'Safari Browser' => 'safari'];
+        'Safari Browser' => 'safari'
+    ];
     return $list[$string] ?? 'unknown';
 
 }
@@ -739,7 +745,8 @@ function deviceIcon($string)
     $list = [
         'Tablet' => 'bi-laptop',
         'Mobile' => 'bi-phone',
-        'Computer' => 'bi-display'];
+        'Computer' => 'bi-display'
+    ];
     return $list[$string] ?? '';
 
 }
@@ -778,7 +785,8 @@ if (!function_exists('timeAgo')) {
 if (!function_exists('code')) {
     function code($length)
     {
-        if ($length == 0) return 0;
+        if ($length == 0)
+            return 0;
         $min = pow(10, $length - 1);
         $max = 0;
         while ($length > 0 && $length--) {
@@ -978,7 +986,7 @@ if (!function_exists('getFooterMenuData')) {
                     $pageDetails = getPageDetails($page->home_name);
                     $menuIDetails = [
                         'name' => $pageDetails->page_name ?? $pageDetails->name ?? $menuItem,
-//                        'name' => $pageDetails->slug == '/' ? 'Home' : $pageDetails->page_name ?? $pageDetails->name ?? $menuItem,
+                        //                        'name' => $pageDetails->slug == '/' ? 'Home' : $pageDetails->page_name ?? $pageDetails->name ?? $menuItem,
                         'route' => isset($slug) ? route('page', $slug) : ($pageDetails->custom_link ?? staticPagesAndRoutes($menuItem)),
                     ];
                     $menuData[] = $menuIDetails;
@@ -1224,7 +1232,8 @@ if (!function_exists('strRandomNum')) {
 
 
 
-function generatePhoneNumber($prefix, $length) {
+function generatePhoneNumber($prefix, $length)
+{
     // Ensure prefix does not include any '+'
     $prefix = ltrim($prefix, '+');
 
@@ -1236,4 +1245,22 @@ function generatePhoneNumber($prefix, $length) {
 
     // Combine prefix and number
     return $prefix . $number;
+}
+
+
+if (!function_exists('getAuthUser')) {
+    function getAuthUser($guard = 'web')
+    {
+        return Auth::guard($guard)->user();
+    }
+}
+
+if (!function_exists('getCurrentGuard')) {
+    function getCurrentGuard()
+    {
+        return Auth::guard('admin')->check() ?
+            'admin'
+            :
+            (Auth::guard('agent')->check() ? 'agent' : 'web');
+    }
 }

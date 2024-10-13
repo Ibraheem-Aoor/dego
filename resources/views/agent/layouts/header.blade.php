@@ -187,7 +187,7 @@
                            data-bs-dropdown-animation>
                             <div class="avatar avatar-sm avatar-circle">
                                 <img class="avatar-img"
-                                     src="{{getFile(getAuthUser(getCurrentGuard())->image_driver, getAuthUser(getCurrentGuard())->image)}}"
+                                     src="{{getFile(Auth::guard('admin')->user()->image_driver, Auth::guard('admin')->user()->image)}}"
                                      alt="Image Description">
                                 <span class="avatar-status avatar-sm-status avatar-status-success"></span>
                             </div>
@@ -200,12 +200,12 @@
                                 <div class="d-flex align-items-center">
                                     <div class="avatar avatar-sm avatar-circle">
                                         <img class="avatar-img"
-                                             src="{{getFile(getAuthUser(getCurrentGuard())->image_driver, getAuthUser(getCurrentGuard())->image)}}"
+                                             src="{{getFile(Auth::guard('admin')->user()->image_driver, Auth::guard('admin')->user()->image)}}"
                                              alt="Image Description">
                                     </div>
                                     <div class="flex-grow-1 ms-3">
-                                        <h5 class="mb-0">{{getAuthUser(getCurrentGuard())->name}}</h5>
-                                        <p class="card-text text-body">{{getAuthUser(getCurrentGuard())->email}}</p>
+                                        <h5 class="mb-0">{{auth()->user()->name}}</h5>
+                                        <p class="card-text text-body">{{auth()->user()->email}}</p>
                                     </div>
                                 </div>
                             </div>
@@ -217,11 +217,11 @@
 
                             <div class="dropdown-divider"></div>
 
-                            <a class="dropdown-item" href="{{ route(getCurrentGuard().'.logout') }}"
+                            <a class="dropdown-item" href="{{ route('admin.logout') }}"
                                onclick="event.preventDefault();document.getElementById('logout-form').submit();">
                                 @lang("Sign out")
                             </a>
-                            <form id="logout-form" action="{{ route(getCurrentGuard().'.logout') }}" method="POST" class="d-none">
+                            <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
                                 @csrf
                             </form>
                         </div>

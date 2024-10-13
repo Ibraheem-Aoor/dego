@@ -46,6 +46,7 @@ class ForgotPasswordController extends Controller
 
     public function submitForgetPassword(Request $request)
     {
+        dd($request->toArray());
         $request->validate([
             'email' => 'required|email|exists:users',
         ]);

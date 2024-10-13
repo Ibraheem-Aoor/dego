@@ -33,30 +33,34 @@ class LoginController extends Controller
 
     protected $maxAttempts = 3; // Change this to 4 if you want 4 tries
     protected $decayMinutes = 5; // Change this according to your
-    protected $redirectTo = 'admin/dashboard';
+    protected $redirectTo = '';
 
-    public function __construct()
+    protected $layer;
+    protected $login_route;
+
+    public function __construct(Request $request)
     {
         $this->middleware('guest:admin')->except('logout');
+        $this->layer = $request->segment(1);
+        $this->login_route = $this->layer.'.login';
     }
 
     public function showLoginForm()
     {
         $data['basicControl'] = basicControl();
-
+        $data['layer'] = $this->layer;
         return view('admin.auth.login', $data);
     }
 
     protected function guard()
     {
-        return Auth::guard('admin');
+        return Auth::guard($this->layer);
     }
 
     public function login(Request $request)
     {
         $basicControl = basicControl();
         $input = $request->all();
-
         $rules[$this->username()] = 'required';
         $rules ['password'] = 'required';
         if ($basicControl->manual_recaptcha == 1 && $basicControl->manual_recaptcha_admin_login == 1) {
@@ -83,10 +87,10 @@ class LoginController extends Controller
 
         $remember_me = $request->has('remember_me') ? true : false;
         $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-        if (auth()->guard('admin')->attempt(array($fieldType => $input['username'], 'password' => $input['password']), $remember_me)) {
+        if ($this->guard()->attempt(array($fieldType => $input['username'], 'password' => $input['password']), $remember_me)) {
             return $this->sendLoginResponse($request);
         } else {
-            return redirect()->route('admin.login')
+            return redirect()->route($this->login_route)
                 ->with('error', 'Email-Address And Password Are Wrong.');
         }
     }
@@ -109,9 +113,9 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        $this->guard('guard')->logout();
+        Auth::guard($this->layer)->logout();
         $request->session()->invalidate();
-        return $this->loggedOut($request) ?: redirect()->route('admin.login');
+        return $this->loggedOut($request) ?: redirect()->route($this->layer.'.login');
     }
 
     protected function sendLoginResponse(Request $request)
@@ -120,7 +124,7 @@ class LoginController extends Controller
 
         $this->clearLoginAttempts($request);
 
-        if ($response = $this->authenticated($request, $this->guard('admin')->user())) {
+        if ($response = $this->authenticated($request, $this->guard()->user())) {
             return $response;
         }
 
@@ -145,5 +149,10 @@ class LoginController extends Controller
         }
         $user->last_login = Carbon::now();
         $user->save();
+    }
+
+    public function redirectPath()
+    {
+        return $this->layer.'/dashboard';
     }
 }

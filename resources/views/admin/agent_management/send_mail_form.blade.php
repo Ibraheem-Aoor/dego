@@ -4,7 +4,7 @@
     <div class="content container-fluid">
         <div class="row justify-content-lg-center">
             <div class="col-lg-10">
-                @include('admin.agent   _management.components.header_user_profile')
+                @include('admin.agent_management.components.header_user_profile')
                 <div class="row" id="add_kyc_form_table">
                     <div class="col-lg-12">
                         <div class="d-grid gap-3 gap-lg-5">
@@ -13,7 +13,7 @@
                                     <h4 class="card-title mt-2">{{ trans('Send Email To ' . $user->firstname .' '.$user->lastname) }}</h4>
                                 </div>
                                 <div class="card-body mt-2">
-                                    <form action="{{ route('admin.user.email.send', $user->id) }}" method="post" enctype="multipart/form-data">
+                                    <form action="{{ route('admin.agents.email.send', $user->id) }}" method="post" enctype="multipart/form-data">
                                         @csrf
                                         <div class="row">
                                             <div class="mb-3">

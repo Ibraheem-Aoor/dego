@@ -91,7 +91,7 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
     Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])
         ->name('password.reset')->middleware('guest:admin');
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])
-        ->name('admin.password.reset.update');
+        ->name('password.reset.update');
 
 
     Route::middleware(['auth:admin', 'demo'])->group(function () {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\Notify;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Agent extends Authenticatable
 {
-    use HasFactory , SoftDeletes , Notifiable;
+    use HasFactory , SoftDeletes , Notifiable , Notify;
     protected $fillable = [
         'name',
         'username',
@@ -24,6 +25,11 @@ class Agent extends Authenticatable
         'phone',
         'last_login',
         'last_seen',
+    ];
+
+    protected $hidden = [
+        'remember_token',
+        'password',
     ];
 
     public function profilePicture()
@@ -46,6 +52,13 @@ class Agent extends Authenticatable
                      </div>';
 
         }
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->mail($this, 'PASSWORD_RESET', $params = [
+            'message' => '<a href="' . url('agent/password/reset', $token) . '?email=' . $this->email . '" target="_blank">Click To Reset Password</a>'
+        ]);
     }
 
 }

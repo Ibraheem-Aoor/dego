@@ -120,6 +120,12 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        'agents' => [
+            'provider' => 'agents',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
     ],
 
     /*

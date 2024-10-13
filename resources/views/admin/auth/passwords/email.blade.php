@@ -10,7 +10,7 @@
                 </div>
             @endif
 
-            <form method="post" action="{{ route('admin.password.email') }}">
+            <form method="post" action="{{ route($layer.'.password.email') }}">
                 @csrf
                 <div class="text-center">
                     <div class="mb-5">
@@ -32,7 +32,7 @@
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary btn-lg">@lang("Submit")</button>
                     <div class="text-center">
-                        <a class="btn btn-link" href="{{ route('admin.login') }}">
+                        <a class="btn btn-link" href="{{ route($layer.'.login') }}">
                             <i class="bi-chevron-left"></i> @lang("Back to Sign in")
                         </a>
                     </div>

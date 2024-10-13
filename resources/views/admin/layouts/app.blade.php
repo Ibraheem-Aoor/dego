@@ -104,7 +104,7 @@
 
 @include('admin.layouts.header')
 
-@include('admin.layouts.sidebar')
+@include(getCurrentGuard().'.layouts.sidebar')
 
 <!-- ========== MAIN CONTENT ========== -->
 <main id="content" role="main" class="main">

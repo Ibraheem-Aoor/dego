@@ -1081,7 +1081,6 @@ class AgentController extends Controller
 
     public function sendMailUser(Request $request, $id = null)
     {
-
         $request->validate([
             'subject' => 'required|min:5',
             'description' => 'required|min:10',
@@ -1089,7 +1088,7 @@ class AgentController extends Controller
 
         try {
 
-            $user = Agent::where('id', $id)->first();
+            $user = Agent::query()->findOrFail($id);
 
             $subject = $request->subject;
             $template = $request->description;
@@ -1106,6 +1105,7 @@ class AgentController extends Controller
             return back()->with('success', 'Email Sent Successfully');
 
         } catch (\Exception $exception) {
+            dd($exception);
             return back()->with('error', $exception->getMessage());
         }
     }
