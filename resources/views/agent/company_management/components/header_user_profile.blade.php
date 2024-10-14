@@ -55,8 +55,8 @@
 
     <ul class="nav nav-tabs align-items-center">
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('admin.user.view.profile') ? 'active' : '' }}"
-               href="{{ route('admin.user.view.profile', $user->id) }}">@lang('Profile')</a>
+            <a class="nav-link {{ request()->routeIs('agent.company.view.profile') ? 'active' : '' }}"
+               href="{{ route('agent.company.view.profile', $user->id) }}">@lang('Profile')</a>
         </li>
         <li class="nav-item">
             <a class="nav-link {{ request()->routeIs('admin.user.transaction') ? 'active' : '' }}"
@@ -65,7 +65,7 @@
 
         <li class="nav-item ms-auto">
             <div class="d-flex gap-2">
-                <a class="btn btn-white btn-sm" href="{{ route('admin.agents.edit', $user->id) }}"> <i
+                <a class="btn btn-white btn-sm" href="{{ route('agent.company.edit', $user->id) }}"> <i
                         class="bi-person-plus-fill me-1"></i> @lang('Edit profile') </a>
                 <div class="dropdown nav-scroller-dropdown">
                     <button type="button" class="btn btn-white btn-icon btn-sm" id="profileDropdown"
@@ -75,10 +75,10 @@
 
                     <div class="dropdown-menu dropdown-menu-end mt-1" aria-labelledby="profileDropdown">
                         <span class="dropdown-header">@lang('Settings')</span>
-                        <a class="dropdown-item" href="{{ route('admin.agents.send.email', $user->id) }}"> <i
+                        <a class="dropdown-item" href="{{ route('agent.company.send.email', $user->id) }}"> <i
                                 class="bi-envelope dropdown-item-icon"></i> @lang('Send Mail') </a>
                         <a class="dropdown-item blockProfile" href="javascript:void(0)"
-                           data-route="{{ route('admin.agents.block.profile', $user->id) }}"
+                           data-route="{{ route('agent.company.block.profile', $user->id) }}"
                            data-bs-toggle="modal" data-bs-target="#blockProfileModal">
                             <i class="bi-person dropdown-item-icon"></i> @lang('Block Profile') </a>
                         <a class="dropdown-item loginAccount d-none" href="javascript:void(0)"

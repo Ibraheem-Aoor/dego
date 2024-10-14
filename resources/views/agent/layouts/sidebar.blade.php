@@ -67,8 +67,8 @@
                                 @lang('All Companies')
                             </a>
 
-                            <a class="nav-link {{ menuActive(['admin.mail.all.user']) }}"
-                                href="{{ route('admin.mail.all.user') }}">@lang('Mail To Users')</a>
+                            <a class="nav-link {{ menuActive(['agent.company.mail.all']) }}"
+                                href="{{ route('agent.company.mail.all') }}">@lang('Mail To Companies')</a>
                         </div>
                     </div>
                 </div>

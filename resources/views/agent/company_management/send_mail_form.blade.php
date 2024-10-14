@@ -13,7 +13,7 @@
                                     <h4 class="card-title mt-2">{{ trans('Send Email To ' . $user->firstname .' '.$user->lastname) }}</h4>
                                 </div>
                                 <div class="card-body mt-2">
-                                    <form action="{{ route('admin.agents.email.send', $user->id) }}" method="post" enctype="multipart/form-data">
+                                    <form action="{{ route('agent.company.email.send', $user->id) }}" method="post" enctype="multipart/form-data">
                                         @csrf
                                         <div class="row">
                                             <div class="mb-3">

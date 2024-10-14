@@ -7,7 +7,7 @@
         <div class="row justify-content-lg-center">
             <div class="col-lg-10">
 
-                @include('admin.agent_management.components.header_user_profile')
+                @include('agent.company_management.components.header_user_profile')
 
                 <div class="row">
                     <div class="col-lg-4">
@@ -56,7 +56,6 @@
         </div>
     </div>
 
-    @include('admin.user_management.components.login_as_user')
     @include('admin.user_management.components.block_profile_modal')
 
 @endsection

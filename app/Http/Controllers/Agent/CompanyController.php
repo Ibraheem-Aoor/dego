@@ -101,7 +101,7 @@ class CompanyController extends Controller
                                        data-id="' . $item->id . '">';
             })
             ->addColumn('name', function ($item) {
-                $url = route('admin.user.view.profile', $item->id);
+                $url = route('agent.company.view.profile', $item->id);
                 return '<a class="d-flex align-items-center me-2" href="' . $url . '">
                                 <div class="flex-shrink-0">
                                   ' . $item->profilePicture() . '
@@ -148,7 +148,7 @@ class CompanyController extends Controller
                        <a class="dropdown-item" href="' . $viewProfile . '">
                           <i class="bi-eye-fill dropdown-item-icon"></i> ' . trans("View Profile") . '
                         </a>
-                          <a class="dropdown-item" href="' . route('admin.agents.send.email', $item->id) . '"> <i
+                          <a class="dropdown-item" href="' . route('agent.company.send.email', $item->id) . '"> <i
                                 class="bi-envelope dropdown-item-icon"></i> ' . trans("Send Mail") . ' </a>
                           <a class="dropdown-item loginAccount d-none" href="javascript:void(0)"
                            data-route="' . route('admin.login.as.user', $item->id) . '"
@@ -579,6 +579,7 @@ class CompanyController extends Controller
     public function blockProfile(Request $request, $id)
     {
         try {
+
             $user = Company::where('id', $id)->firstOr(function () {
                 throw new \Exception('No User found.');
             });
@@ -620,7 +621,7 @@ class CompanyController extends Controller
 
         try {
 
-            $user = Company::query()->findOrFail($id);
+            $user = Company::query()->find($id);
 
             $subject = $request->subject;
             $template = $request->description;
@@ -637,7 +638,6 @@ class CompanyController extends Controller
             return back()->with('success', 'Email Sent Successfully');
 
         } catch (\Exception $exception) {
-            dd($exception);
             return back()->with('error', $exception->getMessage());
         }
     }

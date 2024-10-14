@@ -18,7 +18,7 @@
                     <h1 class="page-header-title">@lang('Edit @'. $user->username . ' Profile')</h1>
                 </div>
                 <div class="col-sm-auto">
-                    <a class="btn btn-primary" href="{{ route('admin.user.view.profile', $user->id) }}">
+                    <a class="btn btn-primary" href="{{ route('agent.company.view.profile', $user->id) }}">
                         <i class="bi-eye-fill me-1"></i> @lang('View Profile')
                     </a>
                 </div>

@@ -40,5 +40,5 @@ Route::prefix('companies')->as('company.')->group(function () {
     Route::post('block-profile/{id}', [CompanyController::class, 'blockProfile'])->name('block.profile');
     Route::get('send-email/{id}', [CompanyController::class, 'sendEmail'])->name('send.email');
     Route::post('send-email/{id?}', [CompanyController::class, 'sendMailUser'])->name('email.send');
-    Route::get('mail-all-user', [CompanyController::class, 'mailAllUser'])->name('mail.all.user');
+    Route::get('mail-all-user', [CompanyController::class, 'mailAllUser'])->name('mail.all');
 });
