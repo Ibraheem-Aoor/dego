@@ -49,6 +49,7 @@ class LoginController extends Controller
     {
         $data['basicControl'] = basicControl();
         $data['layer'] = $this->layer;
+        $data['page_title'] = ucfirst($this->layer) . ' | Login';
         return view('admin.auth.login', $data);
     }
 

@@ -2,15 +2,36 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\BelongsToCompanyScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class
-Destination extends Model
+class Destination extends Model
 {
     use HasFactory;
-    protected $fillable = ['id','long','lat','country','slug','details','state','city','place','title','thumb_driver','thumb','map','status','created-at'];
+    protected $fillable = [
+        'id',
+        'long',
+        'lat',
+        'country',
+        'slug',
+        'details',
+        'state',
+        'city',
+        'place',
+        'title',
+        'thumb_driver',
+        'thumb',
+        'map',
+        'status',
+        'created-at',
+        'company_id',
+    ];
 
+    protected static function booted()
+    {
+        static::addGlobalScope(BelongsToCompanyScope::class);
+    }
 
     protected $casts = [
         'place' => 'object'

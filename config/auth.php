@@ -48,6 +48,10 @@ return [
             'driver' => 'session',
             'provider' => 'agents',
         ],
+        'company' => [
+            'driver' => 'session',
+            'provider' => 'companies',
+        ],
     ],
 
     /*
@@ -80,6 +84,10 @@ return [
         'agents' => [
             'driver' => 'eloquent',
             'model' => App\Models\Agent::class,
+        ],
+        'companies' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Company::class,
         ],
 
         // 'users' => [
@@ -121,6 +129,12 @@ return [
             'throttle' => 60,
         ],
         'agents' => [
+            'provider' => 'agents',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'companies' => [
             'provider' => 'agents',
             'table' => 'password_reset_tokens',
             'expire' => 60,

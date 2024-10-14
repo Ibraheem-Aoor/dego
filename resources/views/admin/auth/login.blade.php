@@ -1,5 +1,5 @@
 @extends('admin.layouts.login')
-@section('page_title', __('Admin | Login'))
+@section('page_title', $page_title)
 @section('content')
     <div class="card card-lg mt-lg-5">
         <div class="card-body">

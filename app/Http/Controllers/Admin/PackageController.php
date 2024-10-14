@@ -12,18 +12,18 @@ use App\Models\PackageCategory;
 use App\Models\State;
 use App\Traits\Notify;
 use App\Traits\Upload;
+use App\Traits\WithCompany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Yajra\DataTables\Facades\DataTables;
 
-class PackageController extends Controller
+class PackageController extends BaseAdminController
 {
     use Upload, Notify;
 
     public function list(Request $request)
     {
-
         $query = DB::table('packages')
             ->selectRaw('COUNT(*) as totalPackage,
                  SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as totalActivePackage,
@@ -325,6 +325,7 @@ class PackageController extends Controller
             'city' => $destination->city,
             'state' => $destination->state,
             'country' => $destination->country,
+            'company_id' => $this->auth_company?->id,
         ]);
     }
 

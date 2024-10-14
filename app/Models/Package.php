@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\BelongsToCompanyScope;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,11 @@ class Package extends Model
         'meta_keywords' => 'array'
     ];
 
+
+    protected static function booted()
+    {
+        static::addGlobalScope(BelongsToCompanyScope::class);
+    }
     protected function metaKeywords(): Attribute
     {
         return Attribute::make(

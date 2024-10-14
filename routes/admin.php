@@ -94,7 +94,7 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
         ->name('password.reset.update');
 
 
-    Route::middleware(['auth:admin', 'demo'])->group(function () {
+    Route::middleware(['auth:admin,company', 'demo'])->group(function () {
 
         Route::get('profile', [AdminProfileSettingController::class, 'profile'])->name('profile');
         Route::put('profile', [AdminProfileSettingController::class, 'profileUpdate'])->name('profile.update');

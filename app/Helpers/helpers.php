@@ -1261,6 +1261,6 @@ if (!function_exists('getCurrentGuard')) {
         return Auth::guard('admin')->check() ?
             'admin'
             :
-            (Auth::guard('agent')->check() ? 'agent' : 'web');
+            (Auth::guard('agent')->check() ? 'agent' : (Auth::guard('company')->check() ? 'company' : 'web'));
     }
 }

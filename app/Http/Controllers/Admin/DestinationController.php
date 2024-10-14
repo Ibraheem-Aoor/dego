@@ -18,9 +18,10 @@ use Yajra\DataTables\Facades\DataTables;
 class DestinationController extends Controller
 {
     use Upload, Notify;
-
+    protected $auth_company;
     public function list(Request $request)
     {
+        $auth_company = getAuthUser('company');
 
         $query = DB::table('destinations')
             ->selectRaw('COUNT(*) as totalDestination,
@@ -28,14 +29,14 @@ class DestinationController extends Controller
                  SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as totalInactiveDestination,
                  SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as totalCreatedToday,
                  SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as totalCreatedThisMonth',
-                [now()->startOfDay(), now()->startOfMonth()])
-            ->first();
+                [now()->startOfDay(), now()->startOfMonth()]
+            )->first();
 
-        $data['totalDestination'] = $query->totalDestination != 0  ?: 1;
-        $data['totalActiveDestination'] = $query->totalActiveDestination != 0  ?: 1;
-        $data['totalInactiveDestination'] = $query->totalInactiveDestination != 0  ?: 1;
-        $data['totalCreatedToday'] = $query->totalCreatedToday != 0  ?: 1;
-        $data['totalCreatedThisMonth'] = $query->totalCreatedThisMonth != 0  ?: 1;
+        $data['totalDestination'] = $query->totalDestination != 0 ?: 1;
+        $data['totalActiveDestination'] = $query->totalActiveDestination != 0 ?: 1;
+        $data['totalInactiveDestination'] = $query->totalInactiveDestination != 0 ?: 1;
+        $data['totalCreatedToday'] = $query->totalCreatedToday != 0 ?: 1;
+        $data['totalCreatedThisMonth'] = $query->totalCreatedThisMonth != 0 ?: 1;
         $data['totalActivePercentage'] = ($data['totalActiveDestination'] / $data['totalDestination']) * 100;
         $data['totalInactivePercentage'] = ($data['totalInactiveDestination'] / $data['totalDestination']) * 100;
         $data['totalTotalCreatedTodayPercentage'] = ($data['totalCreatedToday'] / $data['totalDestination']) * 100;
@@ -46,6 +47,7 @@ class DestinationController extends Controller
 
     public function search(Request $request)
     {
+        $auth_company = getAuthUser('company');
         $search = $request->input('search.value') ?? null;
         $filterName = $request->filterName;
         $filterStart = $request->filterStartDate;
@@ -53,6 +55,7 @@ class DestinationController extends Controller
         $category = $request->category;
         $filterStatus = $request->input('filterStatus');
         $packages = Destination::query()
+           
             ->with(['countryTake:id,name', 'stateTake:id,name', 'cityTake:id,name'])
             ->withCount('package')
             ->orderBy('id', 'DESC')
@@ -249,6 +252,7 @@ class DestinationController extends Controller
             $destination->place = $request->place ?? null;
             $destination->thumb_driver = $thumbDriver;
             $destination->map = $map;
+            $destination->company_id = getAuthUser('company')?->id;
             $destination->save();
 
             return back()->with('success', 'Destination added successfully.');
