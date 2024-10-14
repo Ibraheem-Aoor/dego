@@ -118,7 +118,10 @@ return [
 
     'cookie' => [
         'path' => 'cookie',
-    ]
+    ],
 
+    'companyImage' =>[
+        'path' => 'companyProfileImage'
 
+    ],
 ];

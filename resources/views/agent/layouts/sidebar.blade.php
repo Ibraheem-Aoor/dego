@@ -46,25 +46,25 @@
                             <span class="nav-link-title">@lang('Dashboard')</span>
                         </a>
                     </div>
-                    {{-- Agent Panel --}}
-                    <span class="dropdown-header mt-4"> @lang('Agent Panel')</span>
+                    {{-- Company Panel --}}
+                    <span class="dropdown-header mt-4"> @lang('Company Panel')</span>
                     <small class="bi-three-dots nav-subtitle-replacer"></small>
 
                     <div class="nav-item">
-                        <a class="nav-link dropdown-toggle {{ menuActive(['admin.agents.index'], 3) }}"
+                        <a class="nav-link dropdown-toggle {{ menuActive(['agent.company.index'], 3) }}"
                             href="#navbarVerticalUserPanelMenu" role="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarVerticalUserPanelMenu" aria-expanded="false"
                             aria-controls="navbarVerticalUserPanelMenu">
                             <i class="bi-people nav-icon"></i>
-                            <span class="nav-link-title">@lang('Agent Management')</span>
+                            <span class="nav-link-title">@lang('Company Management')</span>
                         </a>
                         <div id="navbarVerticalUserPanelMenu"
-                            class="nav-collapse collapse {{ menuActive(['admin.agents.index', 'admin.agents.add', 'admin.agents.edit', 'admin.agents.view.profile'], 2) }}"
+                            class="nav-collapse collapse {{ menuActive(['agent.company.index', 'agent.company.add', 'agent.company.edit', 'agent.company.view.profile'], 2) }}"
                             data-bs-parent="#navbarVerticalUserPanelMenu">
 
-                            <a class="nav-link {{ menuActive(['admin.agents.index']) }}"
-                                href="{{ route('admin.agents.index') }}">
-                                @lang('All User')
+                            <a class="nav-link {{ menuActive(['agent.company.index']) }}"
+                                href="{{ route('agent.company.index') }}">
+                                @lang('All Companies')
                             </a>
 
                             <a class="nav-link {{ menuActive(['admin.mail.all.user']) }}"

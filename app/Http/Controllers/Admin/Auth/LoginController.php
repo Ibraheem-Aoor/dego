@@ -145,7 +145,7 @@ class LoginController extends Controller
     {
         if ($user->status == 0) {
             $this->guard('guard')->logout();
-            return redirect()->route('admin.login')->with('error', 'You are banned from this application. Please contact with system Administrator.');
+            return redirect()->route($this->layer.'.login')->with('error', 'You are banned from this application. Please contact with system Administrator.');
         }
         $user->last_login = Carbon::now();
         $user->save();

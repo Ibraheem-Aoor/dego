@@ -55,6 +55,6 @@ class UserAllRecordDeleteJob implements ShouldQueue
         });
 
 
-        DB::table('in_app_notifications')->where('in_app_notificationable_id', $this->user->id)->where('in_app_notificationable_type','App\Models\User')->delete();
+        DB::table('in_app_notifications')->where('in_app_notificationable_id', operator: $this->user->id)->where('in_app_notificationable_type','App\Models\User')->delete();
     }
 }

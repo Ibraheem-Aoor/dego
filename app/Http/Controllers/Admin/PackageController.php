@@ -33,11 +33,11 @@ class PackageController extends Controller
                 [now()->startOfDay(), now()->startOfMonth()])
             ->first();
 
-        $data['totalPackage'] = $query->totalPackage;
-        $data['totalActivePackage'] = $query->totalActivePackage;
-        $data['totalInactivePackage'] = $query->totalInactivePackage;
-        $data['totalCreatedToday'] = $query->totalCreatedToday;
-        $data['totalCreatedThisMonth'] = $query->totalCreatedThisMonth;
+        $data['totalPackage'] = $query->totalPackage != 0 ?: 1;
+        $data['totalActivePackage'] = $query->totalActivePackage != 0 ?: 1;
+        $data['totalInactivePackage'] = $query->totalInactivePackage != 0 ?: 1;
+        $data['totalCreatedToday'] = $query->totalCreatedToday != 0 ?: 1;
+        $data['totalCreatedThisMonth'] = $query->totalCreatedThisMonth != 0 ?: 1;
         $data['totalActivePercentage'] = ($data['totalActivePackage'] / $data['totalPackage']) * 100;
         $data['totalInactivePercentage'] = ($data['totalInactivePackage'] / $data['totalPackage']) * 100;
         $data['totalTotalCreatedThisMonthPercentage'] = ($data['totalCreatedThisMonth'] / $data['totalPackage']) * 100;
