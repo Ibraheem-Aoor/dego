@@ -22,8 +22,7 @@ class BookingController extends Controller
     public function all_booking(Request $request, $status = null)
     {
         try {
-            $query = DB::table('bookings')
-                ->selectRaw('
+            $query = Booking::selectRaw('
                     COUNT(CASE WHEN status IN (1, 2, 4) THEN 1 ELSE NULL END) as totalBooking,
                     SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) as totalAcceptedBooking,
                     SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as totalPendingBooking,

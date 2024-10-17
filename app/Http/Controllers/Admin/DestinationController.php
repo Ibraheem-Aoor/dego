@@ -21,10 +21,8 @@ class DestinationController extends Controller
     protected $auth_company;
     public function list(Request $request)
     {
-        $auth_company = getAuthUser('company');
 
-        $query = DB::table('destinations')
-            ->selectRaw('COUNT(*) as totalDestination,
+        $query = Destination::selectRaw('COUNT(*) as totalDestination,
                  SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as totalActiveDestination,
                  SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as totalInactiveDestination,
                  SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as totalCreatedToday,
@@ -33,10 +31,10 @@ class DestinationController extends Controller
             )->first();
 
         $data['totalDestination'] = $query->totalDestination != 0 ?: 1;
-        $data['totalActiveDestination'] = $query->totalActiveDestination != 0 ?: 1;
-        $data['totalInactiveDestination'] = $query->totalInactiveDestination != 0 ?: 1;
-        $data['totalCreatedToday'] = $query->totalCreatedToday != 0 ?: 1;
-        $data['totalCreatedThisMonth'] = $query->totalCreatedThisMonth != 0 ?: 1;
+        $data['totalActiveDestination'] = $query->totalActiveDestination;
+        $data['totalInactiveDestination'] = $query->totalInactiveDestination;
+        $data['totalCreatedToday'] = $query->totalCreatedToday;
+        $data['totalCreatedThisMonth'] = $query->totalCreatedThisMonth;
         $data['totalActivePercentage'] = ($data['totalActiveDestination'] / $data['totalDestination']) * 100;
         $data['totalInactivePercentage'] = ($data['totalInactiveDestination'] / $data['totalDestination']) * 100;
         $data['totalTotalCreatedTodayPercentage'] = ($data['totalCreatedToday'] / $data['totalDestination']) * 100;
@@ -55,7 +53,7 @@ class DestinationController extends Controller
         $category = $request->category;
         $filterStatus = $request->input('filterStatus');
         $packages = Destination::query()
-           
+
             ->with(['countryTake:id,name', 'stateTake:id,name', 'cityTake:id,name'])
             ->withCount('package')
             ->orderBy('id', 'DESC')

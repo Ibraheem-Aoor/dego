@@ -64,6 +64,15 @@ class Booking extends Model
         static::creating(function (Booking $booking) {
             $booking->uid = Str::orderedUuid();
         });
+        // if the auth user is a company get only bookings for that company.
+        static::addGlobalScope('belongsToCompany', function (Builder $builder) {
+            $auth_company = getAuthUser('company');
+            $builder->when(isset($auth_company), function ($query) use ($auth_company) {
+                $query->whereHas('package.company', function ($company) use ($auth_company) {
+                    $company->where('id', $auth_company->id);
+                });
+            });
+        });
     }
     public function user()
     {

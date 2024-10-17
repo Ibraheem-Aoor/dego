@@ -25,6 +25,11 @@ class Package extends Model
     {
         static::addGlobalScope(BelongsToCompanyScope::class);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
+    }
     protected function metaKeywords(): Attribute
     {
         return Attribute::make(

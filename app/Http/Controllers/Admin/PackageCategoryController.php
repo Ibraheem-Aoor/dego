@@ -21,14 +21,15 @@ class PackageCategoryController extends Controller
                  SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as totalInactivePackageCategory,
                  SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as totalCreatedToday,
                  SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as totalCreatedThisMonth',
-                [now()->startOfDay(), now()->startOfMonth()])
+                [now()->startOfDay(), now()->startOfMonth()]
+            )
             ->first();
 
         $data['totalPackageCategory'] = $query->totalPackageCategory != 0 ?: 1;
-        $data['totalActivePackageCategory'] = $query->totalActivePackageCategory != 0 ?: 1;;
-        $data['totalInactivePackageCategory'] = $query->totalInactivePackageCategory != 0 ?: 1;
-        $data['totalCreatedToday'] = $query->totalCreatedToday != 0 ?: 1;
-        $data['totalCreatedThisMonth'] = $query->totalCreatedThisMonth != 0 ?: 1;
+        $data['totalActivePackageCategory'] = $query->totalActivePackageCategory;
+        $data['totalInactivePackageCategory'] = $query->totalInactivePackageCategory;
+        $data['totalCreatedToday'] = $query->totalCreatedToday;
+        $data['totalCreatedThisMonth'] = $query->totalCreatedThisMonth;
         $data['totalActivePercentageCategory'] = ($data['totalActivePackageCategory'] / $data['totalPackageCategory']) * 100;
         $data['totalInactivePercentageCategory'] = ($data['totalInactivePackageCategory'] / $data['totalPackageCategory']) * 100;
         $data['totalTotalCreatedTodayPercentageCategory'] = ($data['totalCreatedToday'] / $data['totalPackageCategory']) * 100;
