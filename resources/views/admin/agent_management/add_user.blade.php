@@ -119,6 +119,29 @@
                                         @enderror
                                     </div>
                                 </div>
+                                <div class="row mb-4">
+                                    <label for="locationLabel"
+                                        class="col-sm-3 col-form-label form-label">@lang('Country')</label>
+                                    <div class="col-sm-9">
+                                        <div class="tom-select-custom mb-4">
+                                            <select class="js-select form-select" id="locationLabel" name="country">
+                                                <option value="country">@lang('Select Country')</option>
+                                                @forelse($allCountry as $country)
+                                                    <option value="{{ $country['name'] }}"
+                                                        {{ old('country') == $country['name'] ? 'selected' : '' }}
+                                                        data-option-template='<span class="d-flex align-items-center"><img class="avatar avatar-xss avatar-circle me-2" src="{{ asset($country['flag']) }}" alt="Flag" /><span class="text-truncate">{{ $country['name'] }}</span></span>'>
+                                                        @lang($country['name'])
+                                                    </option>
+                                                @empty
+                                                @endforelse
+                                            </select>
+                                            @error('country')
+                                                <span class="invalid-feedback d-block">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
 
 
 
@@ -173,6 +196,8 @@
 
                                     <dt class="col-sm-6 text-sm-end mb-2">@lang('Phone:')</dt>
                                     <dd class="col-sm-6 phone">-</dd>
+                                    <dt class="col-sm-6 text-sm-end mb-2">@lang('Country:')</dt>
+                                    <dd class="col-sm-6 country">-</dd>
 
 
                                 </dl>
@@ -231,7 +256,7 @@
 
         function updateFullName() {
             let firstName = $('#firstNameLabel').val();
-            let fullName = firstName ;
+            let fullName = firstName;
             $('.full_name').text(fullName);
 
             let add = $('.addUserBtn');
@@ -288,6 +313,16 @@
         updatePhoneText();
 
 
+        $(document).on("change", "#locationLabel", function() {
+            let countryValue = $("#locationLabel").val();
+            let add = $('.addUserBtn');
+            if (countryValue.trim() === '') {
+                add.prop('disabled', true);
+            } else {
+                add.prop('disabled', false);
+            }
+            $('.country').text(countryValue);
+        });
 
 
 

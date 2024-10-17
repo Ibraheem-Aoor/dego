@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('page_title',__('Edit User'))
+@section('page_title', __('Edit User'))
 @section('content')
     <div class="content container-fluid">
         <!-- Page Header -->
@@ -9,16 +9,16 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb breadcrumb-no-gutter">
                             <li class="breadcrumb-item"><a class="breadcrumb-link"
-                                                           href="javascript:void(0)">@lang('Dashboard')</a></li>
+                                    href="javascript:void(0)">@lang('Dashboard')</a></li>
                             <li class="breadcrumb-item"><a class="breadcrumb-link"
-                                                           href="javascript:void(0)">@lang('User Management')</a></li>
+                                    href="javascript:void(0)">@lang('User Management')</a></li>
                             <li class="breadcrumb-item active" aria-current="page">@lang('Edit User')</li>
                         </ol>
                     </nav>
-                    <h1 class="page-header-title">@lang('Edit @'. $user->username . ' Profile')</h1>
+                    <h1 class="page-header-title">@lang('Edit @' . $user->username . ' Profile')</h1>
                 </div>
                 <div class="col-sm-auto">
-                    <a class="btn btn-primary" href="{{ route('admin.user.view.profile', $user->id) }}">
+                    <a class="btn btn-primary" href="{{ route('admin.agents.view.profile', $user->id) }}">
                         <i class="bi-eye-fill me-1"></i> @lang('View Profile')
                     </a>
                 </div>
@@ -31,14 +31,14 @@
                 <div class="navbar-expand-lg navbar-vertical mb-3 mb-lg-5">
                     <div class="d-grid">
                         <button type="button" class="navbar-toggler btn btn-white mb-3" data-bs-toggle="collapse"
-                                data-bs-target="#navbarVerticalNavMenu" aria-label="Toggle navigation"
-                                aria-expanded="false" aria-controls="navbarVerticalNavMenu">
-                                <span class="d-flex justify-content-between align-items-center">
-                                  <span class="text-dark">@lang('Menu')</span>
-                                  <span class="navbar-toggler-default">
+                            data-bs-target="#navbarVerticalNavMenu" aria-label="Toggle navigation" aria-expanded="false"
+                            aria-controls="navbarVerticalNavMenu">
+                            <span class="d-flex justify-content-between align-items-center">
+                                <span class="text-dark">@lang('Menu')</span>
+                                <span class="navbar-toggler-default">
                                     <i class="bi-list"></i>
-                                  </span>
-                                  <span class="navbar-toggler-toggled">
+                                </span>
+                                <span class="navbar-toggler-toggled">
                                     <i class="bi-x"></i>
                                 </span>
                             </span>
@@ -105,32 +105,30 @@
             <div class="col-lg-9">
                 <div class="d-grid gap-3 gap-lg-5">
                     <form action="{{ route('admin.agents.update', $user->id) }}" method="post"
-                          enctype="multipart/form-data">
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="profile-cover">
                             <div class="profile-cover-img-wrapper">
                                 <img id="profileCoverImg" class="profile-cover-img"
-                                     src="{{ asset('assets/admin/img/img1.jpg') }}"
-                                     alt="Image Description">
+                                    src="{{ asset('assets/admin/img/img1.jpg') }}" alt="Image Description">
                             </div>
                         </div>
 
                         <label class="avatar avatar-xxl avatar-circle avatar-uploader profile-cover-avatar"
-                               for="editAvatarUploaderModal">
+                            for="editAvatarUploaderModal">
                             <img id="editAvatarImgModal" class="avatar-img"
-                                 src="{{ getFile($user->image_driver, $user->image) }}"
-                                 alt="Image Description">
+                                src="{{ getFile($user->image_driver, $user->image) }}" alt="Image Description">
                             <input type="file" class="js-file-attach avatar-uploader-input" id="editAvatarUploaderModal"
-                                   name="image"
-                                   data-hs-file-attach-options='{
+                                name="image"
+                                data-hs-file-attach-options='{
                                     "textTarget": "#editAvatarImgModal",
                                     "mode": "image",
                                     "targetAttr": "src",
                                     "allowTypes": [".png", ".jpeg", ".jpg"]
                                  }'>
                             <span class="avatar-uploader-trigger">
-                          <i class="bi-pencil-fill avatar-uploader-icon shadow-sm"></i>
-                        </span>
+                                <i class="bi-pencil-fill avatar-uploader-icon shadow-sm"></i>
+                            </span>
                         </label>
 
                         <div class="card">
@@ -140,18 +138,18 @@
                             <div class="card-body">
                                 <div class="row mb-4">
                                     <label for="firstNameLabel"
-                                           class="col-sm-3 col-form-label form-label">@lang('Name')</label>
+                                        class="col-sm-3 col-form-label form-label">@lang('Name')</label>
                                     <div class="col-sm-9">
                                         <div class="input-group input-group-sm-vertical">
                                             <input type="text" class="form-control" name="name" id="firstNameLabel"
-                                                   placeholder="First name" aria-label="First name"
-                                                   value="{{ old('firstName', $user->name) }}" autocomplete="off">
+                                                placeholder="First name" aria-label="First name"
+                                                value="{{ old('firstName', $user->name) }}" autocomplete="off">
                                         </div>
                                         @error('name')
-                                        <span class="invalid-feedback d-inline">{{ $message }}</span>
+                                            <span class="invalid-feedback d-inline">{{ $message }}</span>
                                         @enderror
                                         @error('lastName')
-                                        <span class="invalid-feedback d-inline">{{ $message }}</span>
+                                            <span class="invalid-feedback d-inline">{{ $message }}</span>
                                         @enderror
                                     </div>
                                 </div>
@@ -159,32 +157,53 @@
 
                                 <div class="row mb-4">
                                     <label for="phoneLabel"
-                                           class="col-sm-3 col-form-label form-label">@lang('Phone')</label>
+                                        class="col-sm-3 col-form-label form-label">@lang('Phone')</label>
                                     <div class="col-sm-9">
                                         <input type="text" class="js-input-mask form-control" name="phone"
-                                               id="phoneLabel" placeholder="Phone"
-                                               aria-label="Phone" value="{{ old('phone', $user->phone) }}"
-                                               autocomplete="off">
+                                            id="phoneLabel" placeholder="Phone" aria-label="Phone"
+                                            value="{{ old('phone', $user->phone) }}" autocomplete="off">
                                         @error('phone')
-                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                            <span class="invalid-feedback d-block">{{ $message }}</span>
                                         @enderror
                                     </div>
                                 </div>
 
+                                <div class="row mb-4">
+                                    <label for="locationLabel"
+                                        class="col-sm-3 col-form-label form-label">@lang('Country')</label>
+                                    <div class="col-sm-9">
+                                        <div class="tom-select-custom mb-4">
+                                            <select class="js-select form-select" id="locationLabel" name="country">
+                                                @forelse($allCountry as $country)
+                                                    <option value="{{ $country['name'] }}"
+                                                        {{ $country['name'] == $user->country ? 'selected' : '' }}
+                                                        data-option-template='<span class="d-flex align-items-center"><img class="avatar avatar-xss avatar-circle me-2" src="{{ asset($country['flag']) }}" alt="Afghanistan Flag" /><span class="text-truncate">{{ $country['name'] }}</span></span>'>
+                                                        @lang($country['name'])
+                                                    </option>
+                                                @empty
+                                                @endforelse
+                                            </select>
+                                            @error('country')
+                                                <span class="invalid-feedback d-block">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
 
 
                                 <label class="row form-check form-switch mb-4" for="userStatusSwitch">
                                     <span class="col-8 col-sm-3 ms-0">
-                                      <span class="d-block text-dark">@lang('Status')</span>
+                                        <span class="d-block text-dark">@lang('Status')</span>
                                     </span>
                                     <span class="col-4 col-sm-3">
-                                         <input type="hidden" name="status" value="0">
-                                      <input type="checkbox" class="form-check-input" name="status"
-                                             id="userStatusSwitch" value="1" {{ $user->status == 1 ? 'checked' : '' }}>
+                                        <input type="hidden" name="status" value="0">
+                                        <input type="checkbox" class="form-check-input" name="status"
+                                            id="userStatusSwitch" value="1"
+                                            {{ $user->status == 1 ? 'checked' : '' }}>
                                     </span>
                                 </label>
                                 @error('status')
-                                <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
                                 @enderror
 
                                 <div class="d-flex justify-content-start">
@@ -229,7 +248,7 @@
 
 @push('script')
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('.delete-btn').prop('disabled', true);
             $('#deleteAccountCheckbox').on('change', function() {
                 let checkboxValue = $(this).prop('checked');
@@ -242,7 +261,8 @@
 
             new HSFileAttach('.js-file-attach')
             new HSStickyBlock('.js-sticky-block', {
-                targetSelector: document.getElementById('header').classList.contains('navbar-fixed') ? '#header' : null
+                targetSelector: document.getElementById('header').classList.contains('navbar-fixed') ?
+                    '#header' : null
             })
             new bootstrap.ScrollSpy(document.body, {
                 target: '#navbarSettings',
@@ -253,11 +273,5 @@
                 scrollOffset: -20
             })
         })
-
     </script>
 @endpush
-
-
-
-
-

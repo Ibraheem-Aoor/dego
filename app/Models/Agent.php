@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\Notify;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -12,11 +13,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Agent extends Authenticatable
 {
-    use HasFactory , SoftDeletes , Notifiable , Notify;
+    use HasFactory, SoftDeletes, Notifiable, Notify;
     protected $fillable = [
         'name',
         'username',
         'email',
+        'country',
         'password',
         'remember_token',
         'status',
@@ -31,6 +33,19 @@ class Agent extends Authenticatable
         'remember_token',
         'password',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::deleted(function (Agent $agent) {
+            $agent->companies()->delete();
+        });
+    }
+
+    public function companies(): HasMany
+    {
+        return $this->hasMany(Company::class);
+    }
 
     public function profilePicture()
     {

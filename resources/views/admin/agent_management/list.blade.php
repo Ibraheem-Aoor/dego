@@ -307,8 +307,7 @@
         </div>
     </div>
 
-    @include('admin.user_management.components.multiple_user_delete_modal')
-    @include('admin.user_management.components.login_as_user')
+    @include('admin.agent_management.components.multiple_user_delete_modal')
 
 @endsection
 
@@ -427,7 +426,7 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    url: "{{ route('admin.user.delete.multiple') }}",
+                    url: "{{ route('admin.agents.delete.multiple') }}",
                     data: {strIds: strIds},
                     datatType: 'json',
                     type: "post",

@@ -27,6 +27,7 @@ use Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
 use App\Models\Agent;
+use App\Models\Company;
 use Illuminate\Support\Facades\Cache;
 
 class AgentController extends Controller
@@ -102,7 +103,7 @@ class AgentController extends Controller
                                        data-id="' . $item->id . '">';
             })
             ->addColumn('name', function ($item) {
-                $url = route('admin.user.view.profile', $item->id);
+                $url = route('admin.agents.view.profile', $item->id);
                 return '<a class="d-flex align-items-center me-2" href="' . $url . '">
                                 <div class="flex-shrink-0">
                                   ' . $item->profilePicture() . '
@@ -174,14 +175,13 @@ class AgentController extends Controller
     public function deleteMultiple(Request $request)
     {
         if ($request->strIds == null) {
-            session()->flash('error', 'You do not select User.');
+            session()->flash('error', 'You do not select Agent.');
             return response()->json(['error' => 1]);
         } else {
             Agent::whereIn('id', $request->strIds)->get()->map(function ($user) {
-                UserAllRecordDeleteJob::dispatch($user);
                 $user->forceDelete();
             });
-            session()->flash('success', 'User has been deleted successfully');
+            session()->flash('success', 'Agent has been deleted successfully');
             return response()->json(['success' => 1]);
         }
     }
@@ -200,6 +200,7 @@ class AgentController extends Controller
         $data['email_update_route'] = route('admin.agents.email.update', $id);
         $data['username_update_route'] = route('admin.agents.username.update', $id);
         $data['password_update_route'] = route('admin.agents.password.update', $id);
+        $data['allCountry'] = config('country');
 
         $data['user'] = Agent::findOrFail($id);
         return view('admin.agent_management.edit_user', $data);
@@ -216,6 +217,7 @@ class AgentController extends Controller
             'phone' => 'required|unique:agents,phone,' . $id,
             'status' => 'nullable|integer|in:0,1',
             'image' => 'nullable|mimes:jpeg,png,jpg,gif',
+            'country' => 'required|string|min:2|max:100',
             // 'language_id' => Rule::in($languages),
         ]);
 
@@ -239,6 +241,8 @@ class AgentController extends Controller
             $user->update([
                 'name' => $request->name,
                 'phone' => $request->phone,
+                'country' => $request->country,
+
                 'image' => $profileImage ?? $user->image,
                 'image_driver' => $driver ?? $user->image_driver,
                 'status' => $request->status
@@ -327,153 +331,8 @@ class AgentController extends Controller
 
     }
 
-    public function updateBalanceUpdate(Request $request, $id)
-    {
 
 
-        $request->validate([
-            'amount' => 'required|numeric|min:1'
-        ]);
-
-        try {
-
-            $user = Agent::where('id', $id)->firstOr(function () {
-                throw new \Exception('User not found!');
-            });
-
-            if ($request->balance_operation == 1) {
-
-                $user->balance += $request->amount;
-                $user->save();
-
-                $fund = new Fund();
-                $fund->user_id = $user->id;
-                $fund->percentage_charge = 0;
-                $fund->fixed_charge = 0;
-                $fund->charge = 0;
-                $fund->amount = getAmount($request->amount);
-                $fund->status = 1;
-                $fund->save();
-
-                $transaction = new Transaction();
-                $transaction->user_id = $user->id;
-                $transaction->amount = getAmount($request->amount);
-                $transaction->balance = getAmount($user->balance);
-                $transaction->charge = 0;
-                $transaction->trx_type = '+';
-                $transaction->remarks = 'Add Balance';
-                $transaction->trx_id = $fund->transaction;
-                $fund->transactional()->save($transaction);
-
-                $msg = [
-                    'amount' => currencyPosition($fund->amount),
-                    'main_balance' => currencyPosition($user->balance),
-                    'transaction' => $transaction->trx_id
-                ];
-
-                $action = [
-                    "link" => '#',
-                    "icon" => "fa fa-money-bill-alt text-white"
-                ];
-                $firebaseAction = '#';
-                $this->userFirebasePushNotification($user, 'ADD_BALANCE', $msg, $firebaseAction);
-                $this->userPushNotification($user, 'ADD_BALANCE', $msg, $action);
-                $this->sendMailSms($user, 'ADD_BALANCE', $msg);
-
-                return redirect()->route('admin.user.transaction', $user->id)->with('success', 'Balance Updated Successfully.');
-
-            } else {
-
-                if ($request->amount > $user->balance) {
-                    return back()->with('error', 'Insufficient Balance to deducted.');
-                }
-                $user->balance -= $request->amount;
-                $user->save();
-
-                $transaction = new Transaction();
-                $transaction->user_id = $user->id;
-                $transaction->amount = getAmount($request->amount);
-                $transaction->balance = $user->balance;
-                $transaction->charge = 0;
-                $transaction->trx_type = '-';
-                $transaction->remarks = 'Deduction Balance';
-                $transaction->save();
-
-                $msg = [
-                    'amount' => currencyPosition($request->amount),
-                    'main_balance' => currencyPosition($user->balance),
-                    'transaction' => $transaction->trx_id
-                ];
-                $action = [
-                    "link" => route('user.transaction'),
-                    "icon" => "fa fa-money-bill-alt text-white"
-                ];
-                $firebaseAction = route('user.transaction');
-                $this->userFirebasePushNotification($user, 'DEDUCTED_BALANCE', $msg, $firebaseAction);
-                $this->userPushNotification($user, 'DEDUCTED_BALANCE', $msg, $action);
-                $this->sendMailSms($user, 'DEDUCTED_BALANCE', $msg);
-
-                return redirect()->route('admin.user.transaction', $user->id)->with('success', 'Balance Updated Successfully.');
-
-            }
-
-        } catch (\Exception $exp) {
-            return back()->with('error', $exp->getMessage());
-        }
-
-    }
-
-
-    public function preferencesUpdate(Request $request, $id)
-    {
-        $languages = Language::all()->map(function ($item) {
-            return $item->id;
-        });
-
-        $request->validate([
-            'language_id' => Rule::in($languages),
-            'time_zone' => 'required|string|min:1|max:100',
-            'email_verification' => 'nullable|integer|in:0,1',
-            'sms_verification' => 'nullable|integer|in:0,1',
-        ]);
-
-        try {
-            $user = Agent::where('id', $id)->firstOr(function () {
-                throw new \Exception('User not found!');
-            });
-
-            $user->update([
-                'language_id' => $request->language_id,
-                'time_zone' => $request->time_zone,
-                'email_verification' => $request->email_verification,
-                'sms_verification' => $request->sms_verification,
-            ]);
-
-            return back()->with('success', 'Preferences Updated Successfully.');
-
-        } catch (\Exception $exp) {
-            return back()->with('error', $exp->getMessage());
-        }
-
-
-    }
-
-    public function userTwoFaUpdate(Request $request, $id)
-    {
-        try {
-            $user = Agent::where('id', $id)->firstOr(function () {
-                throw new \Exception('User not found!');
-            });
-            $user->update([
-                'two_fa_verify' => ($request->two_fa_security == 1) ? 0 : 1
-            ]);
-
-            return back()->with('success', 'Two Fa Security Updated Successfully.');
-
-        } catch (\Exception $exp) {
-            return back()->with('error', $exp->getMessage());
-        }
-    }
 
     public function userDelete(Request $request, $id)
     {
@@ -484,7 +343,7 @@ class AgentController extends Controller
 
             UserAllRecordDeleteJob::dispatch($user);
             $user->forceDelete();
-            return redirect()->route('admin.users')->with('success', 'User Account Deleted Successfully.');
+            return redirect()->route('admin.agentss')->with('success', 'User Account Deleted Successfully.');
 
         } catch (\Exception $exp) {
             return back()->with('error', $exp->getMessage());
@@ -540,7 +399,7 @@ class AgentController extends Controller
                 throw new Exception('Something went wrong, Please try again.');
             }
             Cache::forget('agent_record');
-            return redirect()->route('admin.user.create.success.message', $response->id)->with('success', 'User created successfully');
+            return $this->userCreateSuccessMessage($response->id);
 
         } catch (\Exception $exp) {
             return back()->with('error', $exp->getMessage());
@@ -550,6 +409,7 @@ class AgentController extends Controller
     public function userCreateSuccessMessage($id)
     {
         $data['user'] = Agent::findOrFail($id);
+        session()->flash('success', 'Agent created successfully');
         return view('admin.agent_management.components.user_add_success_message', $data);
     }
 
@@ -562,487 +422,45 @@ class AgentController extends Controller
         return view('admin.agent_management.user_view_profile', $data);
     }
 
-    public function transaction($id)
-    {
-        $user = Agent::findOrFail($id);
-        return view('admin.agent_management.transactions', compact('user'));
-    }
-
-    public function userTransactionSearch(Request $request, $id)
-    {
-
-        $search = $request->search['value'];
-
-        $filterTransactionId = $request->filterTransactionID;
-        $filterDate = explode('-', $request->filterDate);
-        $startDate = $filterDate[0];
-        $endDate = isset($filterDate[1]) ? trim($filterDate[1]) : null;
-
-        $transaction = Transaction::with('user')
-            ->where('user_id', $id)
-            ->when(!empty($search), function ($query) use ($search) {
-                $query->where(function ($innerQuery) use ($search) {
-                    $innerQuery->where('trx_id', 'LIKE', "%{$search}%")
-                        ->orWhere('remarks', 'LIKE', "%{$search}%");
-                });
-            })
-            ->when(!empty($request->filterDate) && $endDate == null, function ($query) use ($startDate) {
-                $startDate = Carbon::createFromFormat('d/m/Y', trim($startDate));
-                $query->whereDate('created_at', $startDate);
-            })
-            ->when(!empty($request->filterDate) && $endDate != null, function ($query) use ($startDate, $endDate) {
-                $startDate = Carbon::createFromFormat('d/m/Y', trim($startDate));
-                $endDate = Carbon::createFromFormat('d/m/Y', trim($endDate));
-                $query->whereBetween('created_at', [$startDate, $endDate]);
-            })
-            ->when(!empty($filterTransactionId), function ($query) use ($filterTransactionId) {
-                return $query->where('trx_id', $filterTransactionId);
-            })
-            ->orderBy('id', 'DESC')
-            ->get();
-
-
-        return DataTables::of($transaction)
-            ->addColumn('no', function () {
-                static $counter = 0;
-                $counter++;
-                return $counter;
-            })
-            ->addColumn('trx', function ($item) {
-                return $item->trx_id;
-            })
-            ->addColumn('amount', function ($item) {
-                $statusClass = $item->trx_type == '+' ? 'text-success' : 'text-danger';
-                return "<h6 class='mb-0 $statusClass '>" . $item->trx_type . ' ' . currencyPosition($item->amount) . "</h6>";
-
-            })
-            ->addColumn('charge', function ($item) {
-                return currencyPosition($item->charge);
-
-            })
-            ->addColumn('remarks', function ($item) {
-                return $item->remarks;
-            })
-            ->addColumn('date-time', function ($item) {
-                return dateTime($item->created_at, 'd M Y h:i A');
-            })
-            ->rawColumns(['amount', 'charge'])
-            ->make(true);
-    }
-
-
-    public function payment($id)
+    public function companies($id)
     {
         $data['user'] = Agent::findOrFail($id);
-        $data['methods'] = Gateway::where('status', 1)->orderBy('sort_by', 'asc')->get();
+        return view('admin.agent_management.companies', $data);
+    }
 
-        return view('admin.agent_management.payment_log', $data);
-    }
-    public function booking($id)
+
+    public function companiesSearch(Request $request, Agent $agent)
     {
-        $data['user'] = Agent::with('booking')->findOrFail($id);
-        return view('admin.agent_management.booking_log', $data);
-    }
-    public function userBookingSearch(Request $request, $id)
-    {
+
         $search = $request->search['value'];
-        $filterStatus = $request->filterStatus;
-        $filterStart = $request->filterStartDate;
-        $filterEnd = $request->filterEndDate;
-        $filterName = $request->filterName;
-        $filterPackageName = $request->filterPackageName;
-        $filterBookingId = $request->filterBookingId;
 
-
-        $Bookings = Booking::query()->with(['user', 'depositable.gateway:id,name,image,driver'])
-            ->orderBy('id', 'DESC')
-            ->whereIn('status', [1, 2, 4])
-            ->where('user_id', $id)
-            ->when(!empty($search), function ($query) use ($search) {
-                $query->where(function ($innerQuery) use ($search) {
-                    $innerQuery->where('package_title', 'LIKE', "%{$search}%")
-                        ->orWhere('total_price', 'LIKE', "%{$search}%")
-                        ->orWhereHas('user', function ($userQuery) use ($search) {
-                            $userQuery->where('firstname', 'LIKE', "%{$search}%")
-                                ->orWhere('lastname', 'LIKE', "%{$search}%");
-                        });
-                });
-            })
-            ->when(!empty($filterPackageName), function ($query) use ($filterPackageName) {
-                $query->where('package_title', 'LIKE', "%{$filterPackageName}%");
-            })
-            ->when(!empty($filterBookingId), function ($query) use ($filterBookingId) {
-                $query->where('trx_id', 'LIKE', "%{$filterBookingId}%");
-            })
-            ->when(!empty($filterName), function ($query) use ($filterName) {
-                $query->whereHas('user', function ($q) use ($filterName) {
-                    $q->where('firstname', 'LIKE', "%{$filterName}%")
-                        ->orWhere('lastname', 'LIKE', "%{$filterName}%");
-                });
-            })
-            ->when(isset($filterStatus), function ($query) use ($filterStatus) {
-                if ($filterStatus == 'all') {
-                    return $query->where('status', '!=', null);
-                }
-                if ($filterStatus == '5') {
-                    return $query->where('date', '<', now());
-                }
-                return $query->where('status', $filterStatus)->where('date', '>', now());
-            })
-            ->when(isset($filterStart) && !empty($filterStart), function ($query) use ($filterStart) {
-                return $query->whereDate('created_at', '>=', $filterStart);
-            })
-            ->when(isset($filterEnd) && !empty($filterEnd), function ($query) use ($filterEnd) {
-                return $query->whereDate('created_at', '<=', $filterEnd);
+        $users = Company::query()
+            ->whereBelongsTo($agent)
+            ->when(isset($search), function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%");
             });
 
-        return DataTables::of($Bookings)
-            ->addColumn('checkbox', function ($item) {
-                return ' <input type="checkbox" id="chk-' . $item->id . '"
-                                       class="form-check-input row-tic tic-check" name="check" value="' . $item->id . '"
-                                       data-id="' . $item->id . '">';
-            })
-            ->addColumn('booking-id', function ($item) {
-                return $item->trx_id;
-            })
-            ->addColumn('date', function ($item) {
-                return dateTime($item->date) ?? 'N/A';
-            })
-            ->addColumn('duration', function ($item) {
-                return $item->duration . ' Days';
-            })
-            ->addColumn('price', function ($item) {
-                return currencyPosition($item->total_price) ?? 'N/A';
-
-            })
-            ->addColumn('package', function ($item) {
-                $image = optional($item->package)->thumb;
-                if (!$image) {
-                    $firstLetter = substr($item->package_title, 0, 1);
-                    return '<div class="avatar avatar-sm avatar-soft-primary avatar-circle d-flex justify-content-start gap-2 w-100">
-                                <span class="avatar-initials">' . $firstLetter . '</span>
-                                <p class="avatar-initials ms-3">' . $item->title . '</p>
-                            </div>';
-
-                } else {
-                    $url = getFile(optional($item->package)->thumb_driver, optional($item->package)->thumb);
-
-                    return '<a class="d-flex align-items-center me-2" href="javascript:void(0)">
-                                <div class="flex-shrink-0">
-                                  <div class="avatar avatar-sm avatar-circle">
-                                        <img class="avatar-img" src="' . $url . '" alt="Image Description">
-                                  </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                  <h5 class="text-hover-primary mb-0">' . Str::limit($item->package_title, 30) . '</h5>
-                                </div>
-                              </a>';
-
-                }
-            })
-            ->addColumn('status', function ($item) {
-                if ($item->status == 4) {
-                    return '<span class="badge bg-soft-secondary text-secondary">
-                    <span class="legend-indicator bg-secondary"></span>' . trans('Refunded') . '
-                  </span>';
-                } elseif ($item->status == 2) {
-                    return '<span class="badge bg-soft-success text-success">
-                    <span class="legend-indicator bg-success"></span>' . trans('Completed') . '
-                  </span>';
-                } elseif ($item->status == 1 && strtotime($item->date) > strtotime(date('Y-m-d'))) {
-                    return '<span class="badge bg-soft-warning text-warning">
-                    <span class="legend-indicator bg-warning"></span>' . trans('Pending') . '
-                  </span>';
-                } elseif ($item->status == 0) {
-                    return '<span class="badge bg-soft-warning text-warning">
-                    <span class="legend-indicator bg-warning"></span>' . trans('Payment Pending') . '
-                  </span>';
-                } elseif (strtotime($item->date) < strtotime(date('Y-m-d'))) {
-                    return '<span class="badge bg-soft-danger text-danger">
-                        <span class="legend-indicator bg-danger"></span>' . trans('Expired') . '
-                    </span>';
-                }
-            })
-            ->addColumn('create-at', function ($item) {
-                return dateTime($item->created_at);
-            })
-            ->addColumn('action', function ($item) {
-                $editUrl = route('admin.booking.edit', $item->id);
-                $refundUrl = route('admin.booking.refund', $item->id);
-                $actionUrl = route('admin.booking.action', $item->id);
-
-                $dropdownMenu = '';
-                if ($item->status == 1 && $item->date > now()) {
-                    $dropdownMenu = '
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-white btn-icon btn-sm dropdown-toggle dropdown-toggle-empty" id="userEditDropdown" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <div class="dropdown-menu dropdown-menu-end mt-1" aria-labelledby="userEditDropdown">
-                            <a class="dropdown-item refundBtn" href="javascript:void(0)"
-                                data-route="' . $refundUrl . '"
-                                data-bs-toggle="modal" data-bs-target="#refundModal">
-                                <i class="bi bi-arrow-up-circle"></i>
-                                ' . trans("Refund") . '
-                            </a>';
-
-                    $username = $item->firstname . ' ' . $item->lastname;
-                    $dropdownMenu .= '
-                        <a class="dropdown-item actionBtn" href="javascript:void(0)"
-                            data-route="' . $actionUrl . '"
-                            data-bs-toggle="modal"
-                            data-bs-target="#Confirm"
-                            data-amount="' . currencyPosition($item->total_price) . '"
-                            data-id="' . $item->id . '"
-                            data-user="' . $username . '"
-                            data-trx_id = " ' . $item->trx_id . ' "
-                            data-paid_date = " ' . dateTime($item->created_at) . ' "
-
-                            >
-                            <i class="bi bi-check-square"></i>
-                            ' . trans("Confirm") . '
-                        </a>';
-                    $dropdownMenu .= '</div>
-                        </div>';
-                }
-
-                return '
-                <div class="btn-group" role="group">
-                    <a href="' . $editUrl . '" class="btn btn-white btn-sm edit_user_btn">
-                        <i class="bi-eye me-1"></i> ' . trans("View") . '
-                    </a>
-                    ' . $dropdownMenu . '
-                </div>';
-            })
-            ->rawColumns(['action', 'checkbox', 'create-at', 'booking-id', 'package', 'status', 'duration', 'date', 'price'])
-            ->make(true);
-    }
-    public function userPaymentSearch(Request $request, $id)
-    {
-        $filterTransactionId = $request->filterTransactionID;
-        $filterStatus = $request->filterStatus;
-        $filterMethod = $request->filterMethod;
-        $basicControl = basicControl();
-        $search = $request->search['value'];
-
-        $filterDate = explode('-', $request->filterDate);
-        $startDate = $filterDate[0];
-        $endDate = isset($filterDate[1]) ? trim($filterDate[1]) : null;
-
-        $funds = Deposit::with('user', 'gateway')
-            ->where('user_id', $id)
-            ->where('status', '!=', 0)
-            ->when(!empty($search), function ($query) use ($search) {
-                return $query->where(function ($subquery) use ($search) {
-                    $subquery->where('transaction', 'LIKE', "%$search%")
-                        ->orWhereHas('gateway', function ($q) use ($search) {
-                            $q->where('name', 'LIKE', "%$search%");
-                        });
-                });
-            })
-            ->when(!empty($filterTransactionId), function ($query) use ($filterTransactionId) {
-                return $query->where('trx_id', $filterTransactionId);
-            })
-            ->when(isset($filterStatus), function ($query) use ($filterStatus) {
-                if ($filterStatus == "all") {
-                    return $query->where('status', '!=', null);
-                }
-                return $query->where('status', $filterStatus);
-            })
-            ->when(isset($filterMethod), function ($query) use ($filterMethod) {
-                return $query->whereHas('gateway', function ($subQuery) use ($filterMethod) {
-                    if ($filterMethod == "all") {
-                        $subQuery->where('id', '!=', null);
-                    } else {
-                        $subQuery->where('id', $filterMethod);
-                    }
-                });
-            })
-            ->when(!empty($request->filterDate) && $endDate == null, function ($query) use ($startDate) {
-                $startDate = Carbon::createFromFormat('d/m/Y', trim($startDate));
-                $query->whereDate('created_at', $startDate);
-            })
-            ->when(!empty($request->filterDate) && $endDate != null, function ($query) use ($startDate, $endDate) {
-                $startDate = Carbon::createFromFormat('d/m/Y', trim($startDate));
-                $endDate = Carbon::createFromFormat('d/m/Y', trim($endDate));
-                $query->whereBetween('created_at', [$startDate, $endDate]);
-            })
-            ->latest()
-            ->get();
-
-
-        return DataTables::of($funds)
+        return DataTables::of($users)
             ->addColumn('no', function ($item) {
-                static $counter = 0;
+                static $counter = 1;
                 $counter++;
                 return $counter;
             })
-            ->addColumn('trx', function ($item) {
-                return $item->trx_id;
+            ->addColumn('name', function ($item) {
+                return $item->name;
             })
-            ->addColumn('method', function ($item) {
-                return '<a class="d-flex align-items-center me-2" href="javascript:void(0)">
-                                <div class="flex-shrink-0">
-                                  ' . $item->picture() . '
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                  <h5 class="text-hover-primary mb-0">' . optional($item->gateway)->name . '</h5>
-                                </div>
-                              </a>';
+            ->addColumn('pakcages', function ($item) {
+                return $item->packages()?->count() ?? 'N/A';
             })
-            ->addColumn('amount', function ($item) {
-                $statusClass = $item->getStatusClass();
-                return "<h6 class='mb-0 $statusClass '>" . fractionNumber(getAmount($item->amount)) . ' ' . $item->payment_method_currency . "</h6>";
+            ->addColumn('country', function ($item) {
+                return $item->country ?? 'N/A';
             })
-            ->addColumn('charge', function ($item) {
-                return "<span class='text-danger'>" . fractionNumber(getAmount($item->percentage_charge) + getAmount($item->fixed_charge)) . ' ' . $item->payment_method_currency . "</span>";
+            ->addColumn('date-time' , function ($item) {
+                return $item->created_at->format('d M, Y h:i A');
             })
-            ->addColumn('payable', function ($item) {
-                return "<h6>" . currencyPosition($item->payable_amount_in_base_currency) . "</h6>";
-            })
-            ->addColumn('status', function ($item) {
-                if ($item->status == 0) {
-                    return '<span class="badge bg-soft-warning text-warning">' . trans('Pending') . '</span>';
-                } else if ($item->status == 1) {
-                    return '<span class="badge bg-soft-success text-success">' . trans('Successful') . '</span>';
-                } else if ($item->status == 2) {
-                    return '<span class="badge bg-soft-warning text-warning">' . trans('Pending') . '</span>';
-                } else if ($item->status == 3) {
-                    return '<span class="badge bg-soft-danger text-danger">' . trans('Cancel') . '</span>';
-                }
-            })
-            ->addColumn('date', function ($item) {
-                return dateTime($item->created_at, 'd M Y h:i A');
-            })
-            ->addColumn('action', function ($item) use ($basicControl) {
-
-                $details = null;
-                if ($item->information) {
-                    $details = [];
-                    foreach ($item->information as $k => $v) {
-                        if ($v->type == "file") {
-                            $details[kebab2Title($k)] = [
-                                'type' => $v->type,
-                                'field_name' => $v->field_name,
-                                'field_value' => getFile(config('filesystems.default'), $v->field_value),
-                            ];
-                        } else {
-                            $details[kebab2Title($k)] = [
-                                'type' => $v->type,
-                                'field_name' => $v->field_name,
-                                'field_value' => @$v->field_value ?? $v->field_name
-                            ];
-                        }
-                    }
-                }
-
-                if (optional($item->gateway)->id > 999) {
-                    $icon = $item->status == 2 ? 'pencil' : 'eye';
-                    $detailsJson = !empty($details) ? json_encode($details) : '{}';
-
-                    return "<button type='button' class='btn btn-white btn-sm edit_btn' data-bs-target='#accountInvoiceReceiptModal'
-                        data-detailsinfo='$detailsJson'
-                        data-id='$item->id'
-                        data-feedback='$item->note'
-                        data-amount='" . currencyPosition(getAmount($item->amount)) . "'
-                        data-method='" . optional($item->gateway)->name . "'
-                        data-gatewayimage='" . getFile(optional($item->gateway)->driver, optional($item->gateway)->image) . "'
-                        data-datepaid='" . dateTime($item->created_at) . "'
-                        data-status='$item->status'
-                        data-username='" . optional($item->user)->username . "'
-                        data-action='" . route('admin.payment.action', $item->id) . "'
-                        data-bs-toggle='modal'
-                        data-bs-target='#accountInvoiceReceiptModal'>
-                        <i class='bi-$icon fill me-1'></i>
-                    </button>";
-                } else {
-                    return '-';
-                }
-            })
-            ->rawColumns(['method', 'amount', 'charge', 'payable', 'status', 'action'])
-            ->make(true);
-    }
-    public function userKyc($id)
-    {
-        try {
-            $data['user'] = Agent::where('id', $id)->firstOr(function () {
-                throw new Exception('No User found.');
-            });
-            return view('admin.agent_management.user_kyc', $data);
-        } catch (Exception $exception) {
-            return back()->with('error', $exception->getMessage());
-        }
-    }
-
-    public function KycSearch(Request $request, $id)
-    {
-        $filterVerificationType = $request->filterVerificationType;
-        $filterStatus = $request->filterStatus;
-
-        $filterDate = explode('-', $request->filterDate);
-        $startDate = $filterDate[0];
-        $endDate = isset($filterDate[1]) ? trim($filterDate[1]) : null;
-
-        $transaction = UserKyc::with('user')
-            ->where('user_id', $id)
-            ->orderBy('id', 'DESC')
-            ->when(!empty($filterVerificationType), function ($query) use ($filterVerificationType) {
-                return $query->where('kyc_type', $filterVerificationType);
-            })
-            ->when(isset($filterStatus), function ($query) use ($filterStatus) {
-                if ($filterStatus == "all") {
-                    return $query->where('status', '!=', null);
-                }
-                return $query->where('status', $filterStatus);
-            })
-            ->when(!empty($request->filterDate) && $endDate == null, function ($query) use ($startDate) {
-                $startDate = Carbon::createFromFormat('d/m/Y', trim($startDate));
-                $query->whereDate('created_at', $startDate);
-            })
-            ->when(!empty($request->filterDate) && $endDate != null, function ($query) use ($startDate, $endDate) {
-                $startDate = Carbon::createFromFormat('d/m/Y', trim($startDate));
-                $endDate = Carbon::createFromFormat('d/m/Y', trim($endDate));
-                $query->whereBetween('created_at', [$startDate, $endDate]);
-            })
-            ->get();
-
-        return DataTables::of($transaction)
-            ->addColumn('no', function () {
-                static $counter = 0;
-                $counter++;
-                return $counter;
-            })
-            ->addColumn('verification type', function ($item) {
-                return $item->kyc_type;
-
-            })
-            ->addColumn('status', function ($item) {
-                if ($item->status == 0) {
-                    return '<span class="badge bg-soft-warning text-warning">' . trans('Pending') . '</span>';
-                } else if ($item->status == 1) {
-                    return '<span class="badge bg-soft-success text-success">' . trans('Verified') . '</span>';
-                } else if ($item->status == 2) {
-                    return '<span class="badge bg-soft-danger text-danger">' . trans('Rejected') . '</span>';
-                }
-            })
-            ->addColumn('date', function ($item) {
-                return dateTime($item->created_at);
-
-            })
-            ->addColumn('action', function ($item) {
-                $url = route('admin.kyc.view', $item->id);
-                return '<a href="' . $url . '" class="btn btn-white btn-sm">
-                    <i class="bi-eye-fill me-1"></i>
-                  </a>';
-            })
-            ->rawColumns(['name', 'status', 'action'])
             ->make(true);
     }
 
-
-    public function loginAsUser($id)
-    {
-        Auth::guard('web')->loginUsingId($id);
-        return redirect()->route('user.dashboard');
-    }
 
 
     public function blockProfile(Request $request, $id)

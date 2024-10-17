@@ -253,23 +253,23 @@
 
                     <div class="nav-item">
                         <a class="nav-link dropdown-toggle {{ menuActive(['admin.agents.index'], 3) }}"
-                           href="#navbarVerticalUserPanelMenu"
+                           href="#navbarVerticalAgentPanelMenu"
                            role="button"
                            data-bs-toggle="collapse"
-                           data-bs-target="#navbarVerticalUserPanelMenu"
+                           data-bs-target="#navbarVerticalAgentPanelMenu"
                            aria-expanded="false"
-                           aria-controls="navbarVerticalUserPanelMenu">
+                           aria-controls="navbarVerticalAgentPanelMenu">
                             <i class="bi-people nav-icon"></i>
                             <span class="nav-link-title">@lang('Agent Management')</span>
                         </a>
-                        <div id="navbarVerticalUserPanelMenu"
+                        <div id="navbarVerticalAgentPanelMenu"
                              class="nav-collapse collapse {{ menuActive(['admin.agents.index','admin.agents.add','admin.agents.edit',
-                                                                        'admin.agents.view.profile', 
+                                                                        'admin.agents.view.profile',
                                                                         ], 2) }}"
-                             data-bs-parent="#navbarVerticalUserPanelMenu">
+                             data-bs-parent="#navbarVerticalAgentPanelMenu">
 
                             <a class="nav-link {{ menuActive(['admin.agents.index']) }}" href="{{ route('admin.agents.index') }}">
-                                @lang('All User')
+                                @lang('All Agents')
                             </a>
 
                             <a class="nav-link {{ menuActive(['admin.mail.all.user']) }}"

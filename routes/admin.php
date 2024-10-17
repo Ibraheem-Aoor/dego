@@ -361,13 +361,13 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
             Route::post('email/{id}', [AgentController::class, 'EmailUpdate'])->name('email.update');
             Route::post('username/{id}', [AgentController::class, 'usernameUpdate'])->name('username.update');
             Route::post('password/{id}', [AgentController::class, 'passwordUpdate'])->name('password.update');
-            Route::post('preferences/{id}', [AgentController::class, 'preferencesUpdate'])->name('preferences.update');
             Route::get('view-profile/{id}', [AgentController::class, 'userViewProfile'])->name('view.profile');
 
             Route::get('send-email/{id}', [AgentController::class, 'sendEmail'])->name('send.email');
             Route::post('send-email/{id?}', [AgentController::class, 'sendMailUser'])->name('email.send');
             Route::get('mail-all-user', [AgentController::class, 'mailAllUser'])->name('mail.all.user');
-
+            Route::get('/companies/{id}', [AgentController::class, 'companies'])->name('companies');
+            Route::get('/companies/search/{agent}', [AgentController::class, 'companiesSearch'])->name('companies.search');
 
 
         });

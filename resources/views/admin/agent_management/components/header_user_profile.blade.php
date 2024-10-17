@@ -55,12 +55,12 @@
 
     <ul class="nav nav-tabs align-items-center">
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('admin.user.view.profile') ? 'active' : '' }}"
-               href="{{ route('admin.user.view.profile', $user->id) }}">@lang('Profile')</a>
+            <a class="nav-link {{ request()->routeIs('admin.agents.view.profile') ? 'active' : '' }}"
+               href="{{ route('admin.agents.view.profile', $user->id) }}">@lang('Profile')</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('admin.user.transaction') ? 'active' : '' }}"
-               href="{{ route('admin.user.transaction', $user->id) }}">@lang('Companies')</a>
+            <a class="nav-link {{ request()->routeIs('admin.agents.companies') ? 'active' : '' }}"
+               href="{{ route('admin.agents.companies', $user->id) }}">@lang('Companies')</a>
         </li>
 
         <li class="nav-item ms-auto">
