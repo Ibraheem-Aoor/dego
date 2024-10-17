@@ -40,7 +40,7 @@ class CompanyController extends Controller
 
         $company_recored = \Cache::get('company_recored');
         if (!$company_recored) {
-            $company_recored = Company::withTrashed()->selectRaw('COUNT(id) AS totalUserWithTrashed')
+            $company_recored = Company::query()->whereBelongsTo(getAuthUser('agent'))->withTrashed()->selectRaw('COUNT(id) AS totalUserWithTrashed')
                 ->selectRaw('COUNT(CASE WHEN deleted_at IS NULL THEN id END) AS totalUser')
                 ->selectRaw('(COUNT(CASE WHEN deleted_at IS NULL THEN id END) / COUNT(id)) * 100 AS totalUserPercentage')
                 ->selectRaw('COUNT(CASE WHEN status = 1 THEN id END) AS activeUser')
@@ -531,14 +531,15 @@ class CompanyController extends Controller
                 'country' => $request->country,
                 'image' => $profileImage ?? null,
                 'image_driver' => $driver ?? 'local',
-                'status' => $request->status
+                'status' => $request->status,
+                'agent_id' => getAuthUser('agent')->id
             ]);
 
             if (!$response) {
                 throw new Exception('Something went wrong, Please try again.');
             }
             Cache::forget('company_recored');
-            return redirect()->route('admin.user.create.success.message', $response->id)->with('success', 'User created successfully');
+            return $this->userCreateSuccessMessage($response->id);
 
         } catch (\Exception $exp) {
             return back()->with('error', $exp->getMessage());
@@ -548,6 +549,7 @@ class CompanyController extends Controller
     public function userCreateSuccessMessage($id)
     {
         $data['user'] = Company::findOrFail($id);
+        session()->flash('success', 'Company created successfully');
         return view('agent.company_management.components.user_add_success_message', $data);
     }
 

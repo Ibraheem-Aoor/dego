@@ -273,7 +273,7 @@
                             </a>
 
                             <a class="nav-link {{ menuActive(['admin.mail.all.user']) }}"
-                               href="{{ route("admin.mail.all.user") }}">@lang('Mail To Users')</a>
+                               href="{{ route("admin.mail.all.user") }}">@lang('Mail To Agents')</a>
                         </div>
                     </div>
 

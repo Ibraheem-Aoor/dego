@@ -59,7 +59,7 @@
                             <span class="nav-link-title">@lang('Company Management')</span>
                         </a>
                         <div id="navbarVerticalUserPanelMenu"
-                            class="nav-collapse collapse {{ menuActive(['agent.company.index', 'agent.company.add', 'agent.company.edit', 'agent.company.view.profile'], 2) }}"
+                            class="nav-collapse collapse {{ menuActive(['agent.company.index', 'agent.company.add', 'agent.company.edit', 'agent.company.view.profile' , 'agent.company.mail.all'], 2) }}"
                             data-bs-parent="#navbarVerticalUserPanelMenu">
 
                             <a class="nav-link {{ menuActive(['agent.company.index']) }}"
