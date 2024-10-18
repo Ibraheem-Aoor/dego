@@ -47,57 +47,76 @@
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a class="nav-link {{ menuActive(['company.all.destination', 'company.destination.add','company.destination.edit*'], 3) }}"
-                           href="{{ route('company.all.destination') }}" data-placement="left">
+                        <a class="nav-link {{ menuActive(['company.all.destination', 'company.destination.add', 'company.destination.edit*'], 3) }}"
+                            href="{{ route('company.all.destination') }}" data-placement="left">
                             <i class="bi-map nav-icon"></i>
                             <span class="nav-link-title">@lang('Destinations')</span>
                         </a>
                     </div>
+                    {{-- Manage  Packages --}}
                     <div class="nav-item">
-                        <a class="nav-link dropdown-toggle {{ menuActive(['company.all.package.category', 'admin.package.category.add','admin.package.category.edit', 'admin.all.package', 'admin.package.add','admin.package.edit*'], 3) }}"
-                           href="#navbarVerticalPackageMenu"
-                           role="button" data-bs-toggle="collapse"
-                           data-bs-target="#navbarVerticalPackageMenu" aria-expanded="false"
-                           aria-controls="navbarVerticalPackageMenu">
+                        <a class="nav-link dropdown-toggle {{ menuActive(['company.all.package.category', 'admin.package.category.add', 'admin.package.category.edit', 'admin.all.package', 'admin.package.add', 'admin.package.edit*'], 3) }}"
+                            href="#navbarVerticalPackageMenu" role="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarVerticalPackageMenu" aria-expanded="false"
+                            aria-controls="navbarVerticalPackageMenu">
                             <i class="bi bi-boxes nav-icon"></i>
                             <span class="nav-link-title">@lang('Manage Package')</span>
                         </a>
                         <div id="navbarVerticalPackageMenu"
-                             class="nav-collapse collapse {{ menuActive(['company.all.package.category', 'admin.package.category.add','admin.package.category.edit', 'admin.all.package', 'admin.package.add','admin.package.edit*'], 2) }}"
-                             data-bs-parent="#navbarVerticalPackageMenu">
-                            <a class="nav-link d-none {{ menuActive(['company.all.package.category', 'company.package.category.add','company.package.category.edit']) }}"
-                               href="{{ route('company.all.package.category') }}">@lang('Package Category')</a>
+                            class="nav-collapse collapse {{ menuActive(['company.all.package.category', 'admin.package.category.add', 'admin.package.category.edit', 'admin.all.package', 'admin.package.add', 'admin.package.edit*'], 2) }}"
+                            data-bs-parent="#navbarVerticalPackageMenu">
+                            <a class="nav-link d-none {{ menuActive(['company.all.package.category', 'company.package.category.add', 'company.package.category.edit']) }}"
+                                href="{{ route('company.all.package.category') }}">@lang('Package Category')</a>
 
-                            <a class="nav-link {{ menuActive(['company.all.package', 'company.package.add','company.package.edit*']) }}"
-                               href="{{ route('company.all.package') }}">@lang('Packages')</a>
+                            <a class="nav-link {{ menuActive(['company.all.package', 'company.package.add', 'company.package.edit*']) }}"
+                                href="{{ route('company.all.package') }}">@lang('Packages')</a>
                         </div>
                     </div>
+                    {{-- Manage Bookings --}}
                     <div class="nav-item">
-                        <a class="nav-link dropdown-toggle {{ menuActive(['company.all.booking','admin.all.booking.search','admin.booking.edit'], 3) }}"
-                           href="#navbarVerticalBookingMenu"
-                           role="button" data-bs-toggle="collapse"
-                           data-bs-target="#navbarVerticalBookingMenu" aria-expanded="false"
-                           aria-controls="navbarVerticalBookingMenu">
+                        <a class="nav-link dropdown-toggle {{ menuActive(['company.all.booking', 'admin.all.booking.search', 'admin.booking.edit'], 3) }}"
+                            href="#navbarVerticalBookingMenu" role="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarVerticalBookingMenu" aria-expanded="false"
+                            aria-controls="navbarVerticalBookingMenu">
                             <i class="bi bi-boxes nav-icon"></i>
                             <span class="nav-link-title">@lang('Tour Bookings')</span>
                         </a>
                         <div id="navbarVerticalBookingMenu"
-                             class="nav-collapse collapse {{ menuActive(['company.all.booking','admin.all.booking.search','admin.booking.edit'], 2) }}"
-                             data-bs-parent="#navbarVerticalBookingMenu">
+                            class="nav-collapse collapse {{ menuActive(['company.all.booking', 'admin.all.booking.search', 'admin.booking.edit'], 2) }}"
+                            data-bs-parent="#navbarVerticalBookingMenu">
                             <a class="nav-link {{ request()->is('admin/all-booking/all') ? 'active' : '' }}"
-                               href="{{ route('company.all.booking', ['status' => 'all']) }}">@lang('All Tour')</a>
+                                href="{{ route('company.all.booking', ['status' => 'all']) }}">@lang('All Tour')</a>
 
                             <a class="nav-link {{ request()->is('admin/all-booking/pending') ? 'active' : '' }}"
-                               href="{{ route('company.all.booking', ['status' => 'pending']) }}">@lang('Pending Tour')</a>
+                                href="{{ route('company.all.booking', ['status' => 'pending']) }}">@lang('Pending Tour')</a>
 
                             <a class="nav-link {{ request()->is('admin/all-booking/completed') ? 'active' : '' }}"
-                               href="{{ route('company.all.booking', ['status' => 'completed']) }}">@lang('Completed Tour')</a>
+                                href="{{ route('company.all.booking', ['status' => 'completed']) }}">@lang('Completed Tour')</a>
 
                             <a class="nav-link {{ request()->is('admin/all-booking/refunded') ? 'active' : '' }}"
-                               href="{{ route('company.all.booking', ['status' => 'refunded']) }}">@lang('Refunded Tour')</a>
+                                href="{{ route('company.all.booking', ['status' => 'refunded']) }}">@lang('Refunded Tour')</a>
 
                             <a class="nav-link {{ request()->is('admin/all-booking/expired') ? 'active' : '' }}"
-                               href="{{ route('company.all.booking', ['status' => 'expired']) }}">@lang('Expired Tour')</a>
+                                href="{{ route('company.all.booking', ['status' => 'expired']) }}">@lang('Expired Tour')</a>
+                        </div>
+                    </div>
+                    {{-- Manage Cars --}}
+                    <div class="nav-item">
+                        <a class="nav-link dropdown-toggle {{ menuActive(['company.car.list' , 'company.car.add', 'company.car.edit'], 3) }}"
+                            href="#navbarVerticalCarMenu" role="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarVerticalCarMenu" aria-expanded="false"
+                            aria-controls="navbarVerticalCarMenu">
+                            <i class="bi bi-boxes nav-icon"></i>
+                            <span class="nav-link-title">@lang('Manage Cars')</span>
+                        </a>
+                        <div id="navbarVerticalCarMenu"
+                            class="nav-collapse collapse {{ menuActive(['company.car.list' , 'company.car.add', 'company.car.edit'], 2) }}"
+                            data-bs-parent="#navbarVerticalCarMenu">
+                            <a class="nav-link {{ menuActive(['company.car.list' , 'company.car.add', 'company.car.edit']) }}"
+                                href="{{ route('company.car.list') }}">@lang('All Cars')</a>
+
+                            <a class="nav-link {{ menuActive(['company.all.package', 'company.package.add', 'company.package.edit*']) }}"
+                                href="{{ route('company.all.package') }}">@lang('Packages')</a>
                         </div>
                     </div>
                 </div>

@@ -122,6 +122,13 @@ return [
 
     'companyImage' =>[
         'path' => 'companyProfileImage'
-
+    ],
+    'car' => [
+        'path' => 'cars',
+        'size' => '1000x700'
+    ],
+    'car_thumb' => [
+        'path' => 'car_thumbs',
+        'size' => '1000x550'
     ],
 ];

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\DestinationController;
 use App\Http\Controllers\Admin\PackageCategoryController;
 use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Company\CarController;
 use App\Http\Controllers\Company\DashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -81,3 +82,16 @@ Route::any('booking/completed-multiple', [BookingController::class, 'completedMu
 Route::get('package-booking', [BookingController::class, 'totalBooking'])->name('package.booking.History');
 Route::get('package/visitor-history', [BookingController::class, 'visitorHistory'])->name('package.visitor.history');
 Route::get('destiantion/top-visited', [BookingController::class, 'topVisitedDestination'])->name('top.visited.destination');
+
+
+Route::prefix('car')->as('car.')->group(function(){
+    Route::get('list' , [CarController::class , 'list'])->name('list');
+    Route::get('add' , [CarController::class , 'add'])->name('add');
+    Route::post('store' , [CarController::class , 'store'])->name('store');
+    Route::get('edit/{car}' , [CarController::class , 'edit'])->name('edit');
+    Route::post('update/{car}' , [CarController::class , 'update'])->name('update');
+    Route::get('sturi: atus/{car}' , [CarController::class , 'status'])->name('status');
+    Route::get('search' , [CarController::class , 'search'])->name('search');
+    Route::any('delete-multiple' , [CarController::class , 'deleteMultiple'])->name('delete.multiple');
+    Route::any('inactive-multiple' , [CarController::class , 'inactiveMultiple'])->name('inactive.multiple');
+});

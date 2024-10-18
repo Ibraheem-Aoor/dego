@@ -26,7 +26,6 @@ return new class extends Migration
             $table->dateTime('last_seen', 6)->nullable();
             $table->tinyInteger('status' )->default('0')->nullable();
             $table->string('remember_token', 100)->nullable();
-            $table->softDeletes();
             $table->timestamps();
         });
     }

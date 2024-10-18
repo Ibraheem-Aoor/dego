@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Company extends Authenticatable
 {
-    use HasFactory, SoftDeletes, Notifiable, Notify;
+    use HasFactory, Notifiable, Notify;
     protected $fillable = [
         'name',
         'username',
