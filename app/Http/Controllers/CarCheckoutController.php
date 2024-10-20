@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Car;
 use App\Models\Coupon;
 use App\Models\Deposit;
 use App\Models\Gateway;
@@ -19,93 +20,25 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Validator;
 use PhpParser\Node\Expr\New_;
 
-class CheckoutController extends Controller
+class CarCheckoutController extends Controller
 {
     use Upload, Notify, PaymentValidationCheck;
 
-    public function checkoutForm(Request $request, $slug, $uid = null)
+    public function checkoutForm(Request $request, $id)
     {
         try {
-            $data['pageSeo'] = Page::where('home_name', 'packages')
-                ->select('page_title', 'name', 'breadcrumb_image', 'breadcrumb_image_driver', 'breadcrumb_status',
-                    'meta_title', 'meta_keywords', 'meta_description', 'og_description', 'meta_robots',
-                    'meta_image', 'meta_image_driver')
-                ->where('template_name', basicControl()->theme ?? 'relaxation')
-                ->first();
-
-            $user = Auth::user();
-            $data['package'] = Package::with('category:id,name')->where('slug', $slug)->firstOr(function () {
-                throw new \Exception('The package was not found.');
+            // Check Dates Before This Function Call
+            $data['booking_dates'] = array_map('trim' , explode(',', $request->date));
+            $data['booking_dates_label'] = getBookingDatesLabel($data['booking_dates']);
+            $data['days_count'] = count($data['booking_dates']);
+            $request->session()->put('booking_dates', $data['booking_dates']);
+            $data['user'] = Auth::user();
+            $data['car'] = Car::query()->where('id', decrypt($id))->firstOr(function () {
+                throw new \Exception(__('The Car was not found.'));
             });
-            $instant = null;
-            if ($uid && $data['package']) {
-                $instant = Booking::where('uid', $uid)->where('status', 0)->firstOr(function () {
-                    throw new \Exception('The booking record was not found.');
-                });
-            }
-
-            $data['spaceAttribute'] = $data['package']->getBookingsSpaceAttribute($data['package']->id);
-
-            if (isset($request->date) && isset($request->totalInfant) && isset($request->totalChildren) && isset($request->totalAdult)) {
-                $totalPerson = $request->totalAdult + $request->totalInfant + $request->totalChildren;
-                foreach ($data['spaceAttribute'] as $space) {
-                    if ($space['date'] === $request->date) {
-                        if ($totalPerson > $space['space']) {
-                            return back()->with('error', 'You can book only ' . $space['space'] . ' person(s) for this date.');
-                        }
-                        break;
-                    }
-                }
-
-                $adultTotalPrice = ($request->totalAdult ?? 0) * $data['package']->adult_price;
-                $childrenTotalPrice = ($request->totalChildren ?? 0) * $data['package']->children_Price;
-                $infantTotalPrice = ($request->totalInfant ?? 0) * $data['package']->infant_price;
-
-                $totalPrice = $adultTotalPrice + $childrenTotalPrice + $infantTotalPrice;
-
-                if ($data['package']->discount == 1) {
-                    $type = $data['package']->discount_type;
-
-                    if ($type == 0) {
-                        $totalPrice = $totalPrice - (($totalPrice * $data['package']->discount_amount) / 100);
-                    } elseif ($type == 1) {
-                        $totalPrice = $totalPrice - $data['package']->discount_amount;
-                    }
-                }
-            }
-
-            if (!$instant) {
-                $instant = new Booking();
-                $instant->date = $request->date;
-                $instant->total_price = $totalPrice;
-                $instant->total_adult = $request->totalAdult;
-                $instant->total_children = $request->totalChildren;
-                $instant->total_infant = $request->totalInfant;
-                $instant->total_person = $totalPerson;
-                $instant->package_id = $data['package']->id;
-                $instant->package_title = $data['package']->title;
-                $instant->duration = $data['package']->duration;
-                $instant->start_price = $data['package']->adult_price;
-                $instant->startPoint = $data['package']->start_point;
-                $instant->startMessage = $data['package']->startMessage;
-                $instant->endPoint = $data['package']->end_point;
-                $instant->endMessage = $data['package']->endMessage;
-                $instant->fname = $user->firstname;
-                $instant->lname = $user->lastname;
-                $instant->email = $user->email;
-                $instant->phone = $user->phone_code . $user->phone;
-                $instant->postal_code = $user->zip_code;
-                $instant->city = $user->city;
-                $instant->state = $user->state;
-                $instant->country = $user->country;
-                $instant->address_one = $user->addressOne;
-                $instant->address_two = $user->addressTwo;
-                $instant->user_id = $user->id;
-                $instant->save();
-            }
-
-            return view(template() . 'checkout.userInfo', $data, compact('instant'));
+            return view(template() . 'checkout.car.userInfo', $data);
         } catch (\Exception $e) {
+            dd($e);
             return back()->with('error', $e->getMessage());
         }
     }
@@ -113,10 +46,10 @@ class CheckoutController extends Controller
     public function paymentSupportedCurrency(Request $request)
     {
         $gateway = Gateway::where('id', $request->gateway)->first();
-        if (!$gateway){
+        if (!$gateway) {
             return redirect([
-               'success' => false,
-               'message' => 'Gateway is Missing.'
+                'success' => false,
+                'message' => 'Gateway is Missing.'
             ]);
         }
         return response([
@@ -200,9 +133,20 @@ class CheckoutController extends Controller
                 throw new \Exception('The package was not found.');
             });
             $pageSeo = Page::where('home_name', 'packages')
-                ->select('page_title', 'name', 'breadcrumb_image', 'breadcrumb_image_driver', 'breadcrumb_status',
-                    'meta_title', 'meta_keywords', 'meta_description', 'og_description', 'meta_robots',
-                    'meta_image', 'meta_image_driver')
+                ->select(
+                    'page_title',
+                    'name',
+                    'breadcrumb_image',
+                    'breadcrumb_image_driver',
+                    'breadcrumb_status',
+                    'meta_title',
+                    'meta_keywords',
+                    'meta_description',
+                    'og_description',
+                    'meta_robots',
+                    'meta_image',
+                    'meta_image_driver'
+                )
                 ->where('template_name', basicControl()->theme ?? 'relaxation')
                 ->first();
             return view(template() . 'checkout.travelerInfo', compact('package', 'pageSeo', 'instant'));
@@ -281,7 +225,12 @@ class CheckoutController extends Controller
 
     }
 
-    public function checkoutPaymentForm($uid)
+    public function storeBookingForPayment(Request $request)
+    {
+        // ToDO Store Booking Info Here. Then Redirect To Payment Page.
+    }
+
+    public function checkoutPaymentForm($id)
     {
         try {
             $instant = Booking::where('uid', $uid)->firstOr(function () {
@@ -291,9 +240,20 @@ class CheckoutController extends Controller
                 throw new \Exception('The package was not found.');
             });
             $data['pageSeo'] = Page::where('home_name', 'packages')
-                ->select('page_title', 'name', 'breadcrumb_image', 'breadcrumb_image_driver', 'breadcrumb_status',
-                    'meta_title', 'meta_keywords', 'meta_description', 'og_description', 'meta_robots',
-                    'meta_image', 'meta_image_driver')
+                ->select(
+                    'page_title',
+                    'name',
+                    'breadcrumb_image',
+                    'breadcrumb_image_driver',
+                    'breadcrumb_status',
+                    'meta_title',
+                    'meta_keywords',
+                    'meta_description',
+                    'og_description',
+                    'meta_robots',
+                    'meta_image',
+                    'meta_image_driver'
+                )
                 ->where('template_name', basicControl()->theme ?? 'relaxation')
                 ->first();
             $data['gateway'] = Gateway::where('status', 1)->orderBy('sort_by', 'asc')->get();

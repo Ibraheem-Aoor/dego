@@ -15,6 +15,8 @@ use App\Http\Controllers\InAppNotificationController;
 use App\Http\Controllers\User\SupportTicketController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\CarCheckoutController;
+use App\Http\Controllers\CarController;
 use App\Http\Controllers\User\VerificationController;
 use App\Http\Controllers\User\SubscriberController;
 use App\Http\Controllers\User\NotificationController;
@@ -117,6 +119,14 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
                 Route::any('package/make-payment', [CheckoutController::class, 'makePayment'])->name('make.payment');
                 Route::get('coupon/check', [CheckoutController::class, 'checkCoupon'])->name('coupon.check');
                 Route::any('date/update', [CheckoutController::class, 'dateUpdate'])->name('date.update');
+                // User Car Booking Routes
+                Route::prefix('car')->as('car.')->group(function () {
+                    Route::post('/cehckout-form/{id}', [CarCheckoutController::class, 'checkoutForm'])->name('checkout.form');
+                    Route::post('checkout/payment/{id}', [CarCheckoutController::class, 'storeBookingForPayment'])->name('checkout.form.store_booking');
+                    Route::post('checkout/payment/{id}', [CarCheckoutController::class, 'checkoutPaymentForm'])->name('checkout.form.payment.form');
+
+
+                });
 
             });
 
@@ -176,9 +186,16 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
 
     Route::post('contact/send', [FrontendController::class, 'contact'])->name('contact.send');
 
+    // Packages
     Route::get('packages', [PackageController::class, 'packageList'])->name('package');
     Route::get('package/{slug}', [PackageController::class, 'packageDetails'])->name('package.details')->middleware('packageVisitor');
     Route::get('package-search', [PackageController::class, 'packageSearch'])->name('package.search');
+    // Cars
+    Route::prefix('cars')->as('car.')->group(function () {
+        Route::get('/', [CarController::class, 'carList'])->name('index');
+        Route::get('details/{car}', [CarController::class, 'carDetails'])->name('details');
+        // Route::get('package-search', [PackageController::class, 'packageSearch'])->name('package.search');
+    });
 
     Route::get('live-data', [FrontendController::class, 'liveData'])->name('live.data');
 

@@ -1264,3 +1264,33 @@ if (!function_exists('getCurrentGuard')) {
             (Auth::guard('agent')->check() ? 'agent' : (Auth::guard('company')->check() ? 'company' : 'web'));
     }
 }
+if (!function_exists('formatBookingDatesString')) {
+    /**
+     * Format the booking dates string to display the range of booking dates.
+     *
+     * @param array $dates Comma-separated list of dates
+     *
+     * @return string Formatted booking dates string indicating the range of dates
+     */
+    function getBookingDatesLabel(array $dates): string
+    {
+        return __('from') . ' ' . $dates[0] . ' ' . __('to') . ' ' . $dates[count($dates) - 1];
+    }
+}
+if (!function_exists('getDaysCountFromDatesString')) {
+
+    /**
+     * Return the number of days in the given booking dates string.
+     *
+     * The booking dates string is a comma-separated list of dates.
+     *
+     * @param string $dates Comma-separated list of dates
+     *
+     * @return int Number of days in the given booking dates string
+     */
+    function getDaysCountFromDatesString(string $dates): int
+    {
+        $dates_array = explode(',', $dates);
+        return count($dates_array);
+    }
+}
