@@ -146,7 +146,7 @@
                     </div>
                     @if ($car->status == 1)
                         <form id="bookingInformationForm" class="form"
-                            action="{{ route('user.car.checkout.form', encrypt($car->id)) }}" method="post">
+                            action="{{ route('user.car.checkout.form', encrypt($car->id)) }}" method="get">
                             @csrf
                             <div class="tabs-content-box">
                                 <div class="tab-content-box-item tab-content-box-item-active" id="quote1">

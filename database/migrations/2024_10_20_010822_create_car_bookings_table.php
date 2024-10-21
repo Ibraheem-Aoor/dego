@@ -16,13 +16,13 @@ return new class extends Migration
             $table->unsignedBigInteger('car_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('deposit_id')->nullable();
-            $table->string('car_name')->nullable();
             $table->integer('total_price')->nullable();
             $table->integer('start_price')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('lname')->nullable();
             $table->string('fname')->nullable();
             $table->string('email')->nullable();
+            $table->string('phone')->nullable();
             $table->string('country')->nullable();
             $table->string('state')->nullable();
             $table->string('city')->nullable();
@@ -35,6 +35,9 @@ return new class extends Migration
             $table->string('cupon_number')->nullable();
             $table->string('discount_amount')->nullable();
             $table->text('message')->nullable();
+            $table->foreign('car_id')->references('id')->on('cars')->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('deposit_id')->references('id')->on('deposits')->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Car\ProcceedToCheckoutRequest;
+use App\Http\Requests\Car\StoreBookingInfoForPaymentRequest;
 use App\Models\Booking;
 use App\Models\Car;
+use App\Models\CarBooking;
 use App\Models\Coupon;
 use App\Models\Deposit;
 use App\Models\Gateway;
@@ -15,31 +18,102 @@ use App\Traits\Notify;
 use App\Traits\PaymentValidationCheck;
 use App\Traits\Upload;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Validator;
 use PhpParser\Node\Expr\New_;
+use Throwable;
 
 class CarCheckoutController extends Controller
 {
     use Upload, Notify, PaymentValidationCheck;
 
-    public function checkoutForm(Request $request, $id)
+    public function checkoutForm(ProcceedToCheckoutRequest $request, $id, $booking_id = null)
     {
         try {
             // Check Dates Before This Function Call
-            $data['booking_dates'] = array_map('trim' , explode(',', $request->date));
-            $data['booking_dates_label'] = getBookingDatesLabel($data['booking_dates']);
-            $data['days_count'] = count($data['booking_dates']);
-            $request->session()->put('booking_dates', $data['booking_dates']);
+            $data = $this->getBookingDatesData($request->date);
             $data['user'] = Auth::user();
-            $data['car'] = Car::query()->where('id', decrypt($id))->firstOr(function () {
+            $data['object'] = Car::query()->where('id', decrypt($id))->firstOr(function () {
                 throw new \Exception(__('The Car was not found.'));
             });
+            // booking instant being created here because it might be editable in next steps.
+            $data['instant'] = $this->initBooking($data, $booking_id);
             return view(template() . 'checkout.car.userInfo', $data);
         } catch (\Exception $e) {
             dd($e);
             return back()->with('error', $e->getMessage());
+        }
+    }
+
+
+
+    /**
+     * Initialize a booking record if it does not exist based on the provided data.
+     *
+     * @param array $data The data array containing object which is 'car' and user information.
+     * @param int|null $booking_id The ID of the booking record (optional).
+     */
+    private function initBooking(array $data, $booking_id = null): CarBooking
+    {
+        $instant = CarBooking::when(isset($booking_id), function ($query) use ($booking_id) {
+            $query->where('id', decrypt($booking_id));
+        })->first();
+        if (!$instant) {
+            $instant = CarBooking::query()->create([
+                'car_id' => $data['object']->id,
+                'user_id' => $data['user']->id,
+                'status' => 0,
+                'total_price' => $data['object']->rent_price * $data['days_count'],
+                'fname' => $data['user']->firstname,
+                'lname' => $data['user']->lastname,
+                'email' => $data['user']->email,
+                'phone' => $data['user']->phone_code . $data['user']->phone,
+                'postal_code' => $data['user']->zip_code,
+                'city' => $data['user']->city,
+                'state' => $data['user']->state,
+                'country' => $data['user']->country,
+                'address_one' => $data['user']->address_one,
+                'address_two' => $data['user']->address_two,
+            ]);
+        }
+        $this->syncBookingWithItsDates($data['booking_dates'], $instant);
+        return $instant;
+    }
+
+    /**
+     * Prepare an array of booking dates data.
+     *
+     * @param string $dates
+     *
+     * @return array
+     */
+    private function getBookingDatesData(string $dates): array
+    {
+        $data['booking_dates'] = array_map('trim', explode(',', $dates));
+        $data['booking_dates_label'] = getBookingDatesLabel($data['booking_dates']);
+        $data['days_count'] = count($data['booking_dates']);
+        return $data;
+    }
+
+    public function updateDate(ProcceedToCheckoutRequest $request)
+    {
+        try {
+            $date = $this->getBookingDatesData($request->date);
+            $car_booking = CarBooking::where('id', decrypt($request->id))->firstOrFail();
+            $this->syncBookingWithItsDates($date['booking_dates'], $car_booking);
+            if ($request->has(key: 'is_update_in_checkout') && $request->is_update_in_checkout) {
+                $dates = implode(',', $car_booking->bookingDates()->pluck('date')->toArray());
+                $edit_userinfo_url = route('user.car.checkout.form', ['id' => encrypt($car_booking->car_id), 'booking_id' => encrypt($car_booking->id), 'date' => $dates]);
+                return response()->json(['status' => true, 'edit_userinfo_url' => $edit_userinfo_url]);
+            }
+            return response()->json(['status' => true]);
+        } catch (Throwable $e) {
+            dd($e);
+            Log::error('ERROR in CarCheckoutController@updateDate: ' . $e->getMessage());
+            return response()->json(['success' => false]);
         }
     }
 
@@ -75,191 +149,89 @@ class CarCheckoutController extends Controller
         return response()->json(['error' => 'Invalid request'], 400);
     }
 
-    public function checkoutTravelersDetails(Request $request)
-    {
-        $request->validate([
-            'fname' => 'required',
-            'lname' => 'required',
-            'email' => 'required',
-            'phone' => 'required',
-            'address_one' => 'required',
-            'city' => 'required',
-            'state' => 'required',
-            'country' => 'required',
-        ]);
 
-        $package = Package::with('category:id,name')->where('slug', $request->package)->first();
-        if (!$package) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Package Not Found.',
-            ]);
-        }
-        $instant = Booking::where('id', $request->booking)->where('status', 0)->first();
-        if (!$instant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Booking Not Found.',
-            ]);
-        }
-        $instant->fname = $request->fname;
-        $instant->lname = $request->lname;
-        $instant->email = $request->email;
-        $instant->phone = $request->phone;
-        $instant->address_one = $request->address_one;
-        $instant->address_two = $request->address_two;
-        $instant->city = $request->city;
-        $instant->state = $request->state;
-        $instant->country = $request->country;
-        $instant->postal_code = $request->postalCode;
-        $instant->message = $request->message;
-        $instant->date = $request->date;
-        $instant->save();
-
-        return response()->json([
-            'success' => true,
-            'package' => $package,
-            'instant' => $instant,
-        ]);
-    }
-
-    public function getTravel($uid)
+    /**
+     * Store the booking information for payment.
+     *
+     * @param StoreBookingInfoForPaymentRequest $request
+     * @param int $id
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeBookingForPayment(StoreBookingInfoForPaymentRequest $request, $id, $booking_id)
     {
         try {
-            $instant = Booking::where('uid', $uid)->firstOr(function () {
-                throw new \Exception('The booking record was not found.');
+            $car = Car::query()->where('id', decrypt($id))->firstOr(function () {
+                throw new Exception();
             });
-            $package = Package::with('category:id,name')->where('id', $instant->package_id)->firstOr(function () {
-                throw new \Exception('The package was not found.');
-            });
-            $pageSeo = Page::where('home_name', 'packages')
-                ->select(
-                    'page_title',
-                    'name',
-                    'breadcrumb_image',
-                    'breadcrumb_image_driver',
-                    'breadcrumb_status',
-                    'meta_title',
-                    'meta_keywords',
-                    'meta_description',
-                    'og_description',
-                    'meta_robots',
-                    'meta_image',
-                    'meta_image_driver'
-                )
-                ->where('template_name', basicControl()->theme ?? 'relaxation')
-                ->first();
-            return view(template() . 'checkout.travelerInfo', compact('package', 'pageSeo', 'instant'));
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+            $data = $this->getCarBookingData($request, $car);
+            $car_booking = CarBooking::query()->findOrFail(decrypt($booking_id));
+            $car_booking->update($data);
+            $data['car_booking'] = $car_booking;
+            $this->syncBookingWithItsDates($data['booking_dates'], $car_booking);
+            return redirect()->route('user.car.checkout.form.payment.form', encrypt($data['car_booking']->id));
+        } catch (Throwable $e) {
+            dd($e);
+            Log::error('ERROR in CarCheckoutController@storeBookingForPayment: ' . $e->getMessage());
+            return back()->with('error', __('Something went wrong'));
         }
-
     }
 
-    public function checkoutTravelersPayment(Request $request)
+    private function syncBookingWithItsDates(array $booking_dates, CarBooking $car_booking)
     {
-        $messages = [
-            'fname_adult.*.required' => 'Please enter the first name for adult.',
-            'fname_adult.*.string' => 'The first name for adults must be a string.',
-            'fname_adult.*.max' => 'The first name for adults cannot exceed 255 characters.',
-            'lname_adult.*.required' => 'Please enter the last name for adult.',
-            'lname_adult.*.string' => 'The last name for adults must be a string.',
-            'lname_adult.*.max' => 'The last name for adults cannot exceed 255 characters.',
-            'date_adult.*.required' => 'Please enter the birth date for adult.',
-            'date_adult.*.date' => 'The birth date for adults must be a valid date.',
-            'fname_child.*.required' => 'Please enter the first name for child.',
-            'fname_child.*.string' => 'The first name for children must be a string.',
-            'fname_child.*.max' => 'The first name for children cannot exceed 255 characters.',
-            'lname_child.*.required' => 'Please enter the last name for child.',
-            'lname_child.*.string' => 'The last name for children must be a string.',
-            'lname_child.*.max' => 'The last name for children cannot exceed 255 characters.',
-            'date_child.*.required' => 'Please enter the birth date for child.',
-            'date_child.*.date' => 'The birth date for children must be a valid date.',
-            'fname_infant.*.required' => 'Please enter the first name for infant.',
-            'fname_infant.*.string' => 'The first name for infants must be a string.',
-            'fname_infant.*.max' => 'The first name for infants cannot exceed 255 characters.',
-            'lname_infant.*.required' => 'Please enter the last name for infant.',
-            'lname_infant.*.string' => 'The last name for infants must be a string.',
-            'lname_infant.*.max' => 'The last name for infants cannot exceed 255 characters.',
-            'date_infant.*.required' => 'Please enter the birth date for infant.',
-            'date_infant.*.date' => 'The birth date for infants must be a valid date.',
-        ];
-
-        $request->validate([
-            'fname_adult.*' => 'required|string|max:255',
-            'lname_adult.*' => 'required|string|max:255',
-            'date_adult.*' => 'required|date',
-            'fname_child.*' => 'required|string|max:255',
-            'lname_child.*' => 'required|string|max:255',
-            'date_child.*' => 'required|date',
-            'fname_infant.*' => 'required|string|max:255',
-            'lname_infant.*' => 'required|string|max:255',
-            'date_infant.*' => 'required|date',
-        ], $messages);
-
-        $instant = Booking::where('id', $request->booking)->first();
-        if (!$instant) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Booking Not Found.',
-            ]);
+        $data_to_sync = [];
+        if ($car_booking->bookingDates()->count() > 0) {
+            $car_booking->bookingDates()?->delete();
         }
-        if ($request->filled(['fname_adult', 'lname_adult', 'date_adult'])) {
-            $instant->adult_info = $this->formatTravelerInfo($request->fname_adult, $request->lname_adult, $request->date_adult);
+        foreach ($booking_dates as $date) {
+            $data_to_sync[] = [
+                'date' => \Carbon\Carbon::parse($date)->format('Y-m-d'),
+                'car_booking_id' => $car_booking->id,
+                'car_id' => $car_booking->car_id,
+            ];
         }
-
-        if ($request->filled(['fname_child', 'lname_child', 'date_child'])) {
-            $instant->child_info = $this->formatTravelerInfo($request->fname_child, $request->lname_child, $request->date_child);
-        }
-
-        if ($request->filled(['fname_infant', 'lname_infant', 'date_infant'])) {
-            $instant->infant_info = $this->formatTravelerInfo($request->fname_infant, $request->lname_infant, $request->date_infant);
-        }
-
-        $instant->save();
-
-        return response()->json([
-            'success' => true,
-            'instant' => $instant,
-        ]);
-
+        return $car_booking->bookingDates()->createMany($data_to_sync);
     }
 
-    public function storeBookingForPayment(Request $request)
+    /**
+     * Create an array of data for creating a CarBooking model, given validated
+     * request data and a Car model instance.
+     *
+     * @param StoreBookingInfoForPaymentRequest $request
+     * @param Car $car
+     *
+     * @return array
+     */
+    private function getCarBookingData(StoreBookingInfoForPaymentRequest $request, $car): array
     {
-        // ToDO Store Booking Info Here. Then Redirect To Payment Page.
+        $request_data = $request->validated();
+        $user = getAuthUser('web');
+        $data = $this->getBookingDatesData($request->date);
+        $data = array_merge($request_data, $data);
+        $data['start_price'] = $car->rent_price;
+        $data['total_price'] = $car->rent_price * $data['days_count'];
+        $data['user_id'] = $user->id;
+        $data['car_id'] = $car->id;
+        return $data;
     }
 
     public function checkoutPaymentForm($id)
     {
         try {
-            $instant = Booking::where('uid', $uid)->firstOr(function () {
-                throw new \Exception('The booking record was not found.');
+            $data['user'] = getAuthUser('web');
+            $data['instant'] = CarBooking::where('id', decrypt($id))->firstOr(function () {
+                throw new \Exception();
             });
-            $data['package'] = Package::with('category:id,name')->where('id', $instant->package_id)->firstOr(function () {
-                throw new \Exception('The package was not found.');
-            });
-            $data['pageSeo'] = Page::where('home_name', 'packages')
-                ->select(
-                    'page_title',
-                    'name',
-                    'breadcrumb_image',
-                    'breadcrumb_image_driver',
-                    'breadcrumb_status',
-                    'meta_title',
-                    'meta_keywords',
-                    'meta_description',
-                    'og_description',
-                    'meta_robots',
-                    'meta_image',
-                    'meta_image_driver'
-                )
-                ->where('template_name', basicControl()->theme ?? 'relaxation')
-                ->first();
             $data['gateway'] = Gateway::where('status', 1)->orderBy('sort_by', 'asc')->get();
+            $data['object'] = $data['instant']->car;
+            $data['booking_dates'] = $data['instant']->bookingDates()->pluck('date')->toArray();
+            $data['booking_dates_label'] = getBookingDatesLabel($data['booking_dates']);
+            $data['days_count'] = count($data['booking_dates']);
+            $data['date'] = implode(',', $data['instant']->bookingDates()->pluck('date')->toArray());
 
-            return view(template() . 'checkout.checkout_form', array_merge($data, ['instant' => $instant]));
+            return view(template() . 'checkout.car.checkout_form', $data);
         } catch (\Exception $e) {
+            dd($e);
             return back()->with('error', $e->getMessage());
         }
     }
@@ -316,90 +288,6 @@ class CarCheckoutController extends Controller
 
     }
 
-    public function checkCoupon(Request $request)
-    {
-        $request->validate([
-            'coupon' => 'required|string',
-        ]);
-
-        $couponCode = $request->input('coupon');
-        $amount = $request->input('amount');
-        $instantSave = $request->input('instantId');
-        $coupon = Coupon::whereRaw('BINARY coupon_code = ?', [$couponCode])->first();
-
-        if (!$coupon) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Coupon not found.',
-            ], 404);
-        }
-
-        $instant = Booking::find($instantSave);
-
-        $currentDate = now();
-        $endDate = Carbon::createFromFormat('Y-m-d', $coupon->end_date);
-
-        if ($instant->coupon != 1) {
-            if ($currentDate->gt($endDate)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Coupon validity expired.',
-                ], 404);
-            }
-
-            $package = Package::where('id', $instant->package_id)->where('status', 1)->first();
-
-            if (!$package) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Package not found.',
-                ], 404);
-            }
-
-            if ($package->discount == 0) {
-                $discount = ($coupon->discount_type == 0) ? $coupon->discount : ($amount * $coupon->discount) / 100;
-
-                $instant->coupon = 1;
-                $instant->cupon_number = $coupon->coupon_code;
-                $instant->cupon_status = $coupon->discount_type;
-                $instant->discount_amount = $discount;
-                $instant->total_price = $instant->total_price - $discount;
-                $instant->save();
-
-                return response()->json([
-                    'success' => true,
-                    'data' => $instant,
-                ], 200);
-            }
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Coupon not allowed for this package.',
-            ], 404);
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'Coupon not allowed for this package.',
-            ], 404);
-        }
-
-    }
-
-    public function dateUpdate(Request $request)
-    {
-        $id = $request->input('id');
-        $date = $request->input('date');
-        $instant = Booking::where('id', $id)->first();
-        if (!$instant) {
-            return response()->json(['error' => 'Booking with id ' . $id . ' not found'], 404);
-        }
-        $formatted_date = date('Y-m-d', strtotime($date));
-
-        $instant->date = $formatted_date;
-        $instant->save();
-
-        return response()->json(['message' => 'Date updated successfully']);
-    }
 
     public function checkAmountValidate($amount, $selectedCurrency, $selectGateway, $selectedCryptoCurrency = null)
     {

@@ -121,11 +121,10 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
                 Route::any('date/update', [CheckoutController::class, 'dateUpdate'])->name('date.update');
                 // User Car Booking Routes
                 Route::prefix('car')->as('car.')->group(function () {
-                    Route::post('/cehckout-form/{id}', [CarCheckoutController::class, 'checkoutForm'])->name('checkout.form');
-                    Route::post('checkout/payment/{id}', [CarCheckoutController::class, 'storeBookingForPayment'])->name('checkout.form.store_booking');
-                    Route::post('checkout/payment/{id}', [CarCheckoutController::class, 'checkoutPaymentForm'])->name('checkout.form.payment.form');
-
-
+                    Route::get('/cehckout-form/{id}/{booking_id?}', [CarCheckoutController::class, 'checkoutForm'])->name('checkout.form');
+                    Route::post('checkout/payment-booking/{id}/{booking_id}', [CarCheckoutController::class, 'storeBookingForPayment'])->name('checkout.form.store_booking');
+                    Route::post('update-date' , [CarCheckoutController::class, 'updateDate'])->name('date.update');
+                    Route::get('checkout/payment/{id}', [CarCheckoutController::class, 'checkoutPaymentForm'])->name('checkout.form.payment.form');
                 });
 
             });
