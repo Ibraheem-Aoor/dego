@@ -19,7 +19,7 @@
 
                         <div class="card paymentCard">
                             <div class="col-12">
-                                <form class="row g-4" id="checkoutForm" action="{{ route('user.make.payment') }}"
+                                <form class="row g-4" id="checkoutForm" action="{{ route('user.car.make.payment') }}"
                                       method="post" enctype="multipart/form-data">
                                     @csrf
                                     <input name="booking" type="text" id="booking" value="{{$instant->id}}" hidden/>

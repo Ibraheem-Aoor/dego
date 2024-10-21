@@ -123,8 +123,10 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
                 Route::prefix('car')->as('car.')->group(function () {
                     Route::get('/cehckout-form/{id}/{booking_id?}', [CarCheckoutController::class, 'checkoutForm'])->name('checkout.form');
                     Route::post('checkout/payment-booking/{id}/{booking_id}', [CarCheckoutController::class, 'storeBookingForPayment'])->name('checkout.form.store_booking');
-                    Route::post('update-date' , [CarCheckoutController::class, 'updateDate'])->name('date.update');
+                    Route::post('update-date', [CarCheckoutController::class, 'updateDate'])->name('date.update');
                     Route::get('checkout/payment/{id}', [CarCheckoutController::class, 'checkoutPaymentForm'])->name('checkout.form.payment.form');
+                    Route::any('make-payment', [CarCheckoutController::class, 'makePayment'])->name('make.payment');
+
                 });
 
             });
@@ -170,6 +172,8 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
     Route::get('deposit-check-amount', [DepositController::class, 'checkAmount'])->name('deposit.checkAmount');
 
     Route::get('payment-process/{trx_id}', [PaymentController::class, 'depositConfirm'])->name('payment.process');
+    Route::match(['get', 'post'], 'payment/{code}/{trx?}/{type?}', [PaymentController::class, 'gatewayIpn'])->name('ipn');
+
     Route::post('addFundConfirm/{trx_id}', [PaymentController::class, 'fromSubmit'])->name('addFund.fromSubmit');
     Route::match(['get', 'post'], 'success', [PaymentController::class, 'success'])->name('success');
     Route::match(['get', 'post'], 'failed', [PaymentController::class, 'failed'])->name('failed');

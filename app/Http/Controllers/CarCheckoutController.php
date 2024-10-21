@@ -257,9 +257,10 @@ class CarCheckoutController extends Controller
             $gateway = $request->gateway_id;
             $currency = $request->supported_currency ?? $request->base_currency;
             $cryptoCurrency = $request->supported_crypto_currency;
-            $booking = Booking::where('id', $request->booking)->firstOr(function () {
-                throw new \Exception('The booking record was not found.');
-            });
+            $booking = CarBooking::where('id', $request->booking)
+                ->where('user_id', getAuthUser('web')->id)->firstOr(function () {
+                    throw new \Exception('The booking record was not found.');
+                });
 
             $checkAmount = $this->checkAmountValidate($amount, $currency, $gateway, $cryptoCurrency);
             $checkAmountValidate = $this->validationCheck($checkAmount['amount'], $gateway, $currency, $cryptoCurrency);
@@ -268,7 +269,7 @@ class CarCheckoutController extends Controller
             }
             $deposit = Deposit::create([
                 'user_id' => Auth::user()->id,
-                'depositable_type' => Booking::class,
+                'depositable_type' => CarBooking::class,
                 'depositable_id' => $booking->id,
                 'payment_method_id' => $checkAmountValidate['data']['gateway_id'],
                 'payment_method_currency' => $checkAmountValidate['data']['currency'],
