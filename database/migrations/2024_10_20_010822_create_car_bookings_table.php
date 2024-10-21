@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('car_bookings', function (Blueprint $table) {
             $table->id();
+            $table->string('uid')->nullable();
             $table->unsignedBigInteger('car_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('deposit_id')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->integer('total_price')->nullable();
             $table->integer('start_price')->nullable();
             $table->string('postal_code')->nullable();
@@ -38,6 +40,7 @@ return new class extends Migration
             $table->foreign('car_id')->references('id')->on('cars')->cascadeOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('deposit_id')->references('id')->on('deposits')->cascadeOnDelete();
+            $table->foreign('company_id')->references('id')->on('companies')->cascadeOnDelete();
             $table->timestamps();
         });
     }

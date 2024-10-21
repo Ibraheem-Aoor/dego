@@ -1291,6 +1291,7 @@ if (!function_exists('getDaysCountFromDatesString')) {
     function getDaysCountFromDatesString(string $dates): int
     {
         $dates_array = explode(',', $dates);
+        asort($dates_array);
         return count($dates_array);
     }
 }

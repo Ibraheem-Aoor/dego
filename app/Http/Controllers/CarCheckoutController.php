@@ -65,6 +65,7 @@ class CarCheckoutController extends Controller
             $instant = CarBooking::query()->create([
                 'car_id' => $data['object']->id,
                 'user_id' => $data['user']->id,
+                'company_id' => $data['object']->company_id,
                 'status' => 0,
                 'total_price' => $data['object']->rent_price * $data['days_count'],
                 'fname' => $data['user']->firstname,
@@ -190,7 +191,10 @@ class CarCheckoutController extends Controller
                 'car_id' => $car_booking->car_id,
             ];
         }
-        return $car_booking->bookingDates()->createMany($data_to_sync);
+        if(isset($data_to_sync))
+        {
+            $car_booking->bookingDates()->createMany($data_to_sync);
+        }
     }
 
     /**
@@ -237,17 +241,6 @@ class CarCheckoutController extends Controller
     }
 
 
-    private function formatTravelerInfo($firstNames, $lastNames, $birthDates)
-    {
-        return array_map(function ($firstName, $lastName, $birthDate) {
-            return [
-                'first_name' => $firstName,
-                'last_name' => $lastName,
-                'full_name' => $firstName . ' ' . $lastName,
-                'birth_date' => $birthDate
-            ];
-        }, $firstNames, $lastNames, $birthDates);
-    }
 
 
     public function makePayment(Request $request)
@@ -284,7 +277,8 @@ class CarCheckoutController extends Controller
 
             return redirect(route('payment.process', $deposit->trx_id));
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+            Log::error('ERROR in CarCheckoutController@makePayment: ' . $e->getMessage());
+            return back()->with('error', __('Something went wrong'));
         }
 
     }

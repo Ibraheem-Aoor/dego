@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\DestinationController;
 use App\Http\Controllers\Admin\PackageCategoryController;
 use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Company\CarBookingController;
 use App\Http\Controllers\Company\CarController;
 use App\Http\Controllers\Company\DashboardController;
 use Illuminate\Support\Facades\Route;
@@ -96,6 +97,17 @@ Route::middleware('auth:company')->group(function () {
         Route::get('search', [CarController::class, 'search'])->name('search');
         Route::any('delete-multiple', [CarController::class, 'deleteMultiple'])->name('delete.multiple');
         Route::any('inactive-multiple', [CarController::class, 'inactiveMultiple'])->name('inactive.multiple');
+        Route::prefix('booking')->as('booking.')->group(function () {
+            Route::get('all-bookings', [CarBookingController::class, 'all_booking'])->name('all');
+            Route::get('all-bookings/search', [CarBookingController::class, 'all_booking_search'])->name('search');
+            Route::get('edit/{id}', [CarBookingController::class, 'bookingEdit'])->name('edit');
+            Route::get('refund/{id}', [CarBookingController::class, 'bookingRefund'])->name('refund');
+            Route::post('completed/{id}', [CarBookingController::class, 'complete'])->name('action');
+            Route::any('booking/refund-multiple', [CarBookingController::class, 'refundMultiple'])->name('refund.multiple');
+            Route::any('booking/completed-multiple', [CarBookingController::class, 'completedMultiple'])->name('completed.multiple');
+
+
+        });
     });
 });
 

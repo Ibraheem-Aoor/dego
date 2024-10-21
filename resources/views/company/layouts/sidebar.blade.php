@@ -102,21 +102,41 @@
                     </div>
                     {{-- Manage Cars --}}
                     <div class="nav-item">
-                        <a class="nav-link dropdown-toggle {{ menuActive(['company.car.list' , 'company.car.add', 'company.car.edit'], 3) }}"
+                        <a class="nav-link dropdown-toggle {{ menuActive(['company.car.list', 'company.car.add', 'company.car.edit'], 3) }}"
                             href="#navbarVerticalCarMenu" role="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarVerticalCarMenu" aria-expanded="false"
                             aria-controls="navbarVerticalCarMenu">
                             <i class="bi bi-boxes nav-icon"></i>
                             <span class="nav-link-title">@lang('Manage Cars')</span>
                         </a>
-                        <div id="navbarVerticalCarMenu"
-                            class="nav-collapse collapse {{ menuActive(['company.car.list' , 'company.car.add', 'company.car.edit'], 2) }}"
-                            data-bs-parent="#navbarVerticalCarMenu">
-                            <a class="nav-link {{ menuActive(['company.car.list' , 'company.car.add', 'company.car.edit']) }}"
-                                href="{{ route('company.car.list') }}">@lang('All Cars')</a>
+                    </div>
+                    {{-- Manage Car Bookings --}}
+                    {{-- Manage Bookings --}}
+                    <div class="nav-item">
+                        <a class="nav-link dropdown-toggle {{ menuActive(['company.all.booking', 'admin.all.booking.search', 'admin.booking.edit'], 3) }}"
+                            href="#navbarVerticalCarBookingMenu" role="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarVerticalCarBookingMenu" aria-expanded="false"
+                            aria-controls="navbarVerticalCarBookingMenu">
+                            <i class="bi bi-boxes nav-icon"></i>
+                            <span class="nav-link-title">@lang('Car Bookings')</span>
+                        </a>
+                        <div id="navbarVerticalCarBookingMenu"
+                            class="nav-collapse collapse {{ menuActive(['company.all.booking', 'admin.all.booking.search', 'admin.booking.edit'], 2) }}"
+                            data-bs-parent="#navbarVerticalCarBookingMenu">
+                            <a class="nav-link {{ request()->is('admin/all-booking/all') ? 'active' : '' }}"
+                                href="{{ route('company.car.booking.all', ['status' => 'all']) }}">@lang('All Bookings')</a>
 
-                            <a class="nav-link {{ menuActive(['company.all.package', 'company.package.add', 'company.package.edit*']) }}"
-                                href="{{ route('company.all.package') }}">@lang('Packages')</a>
+                            <a class="nav-link {{ request()->is('admin/all-booking/pending') ? 'active' : '' }}"
+                                href="{{ route('company.car.booking.all', ['status' => 'pending']) }}">@lang('Pending Bookings')</a>
+
+                            <a class="nav-link {{ request()->is('admin/all-booking/completed') ? 'active' : '' }}"
+                                href="{{ route('company.car.booking.all', ['status' => 'completed']) }}">@lang('Completed Bookings')</a>
+
+                            <a class="nav-link {{ request()->is('admin/all-booking/refunded') ? 'active' : '' }}"
+                                href="{{ route('company.car.booking.all', ['status' => 'refunded']) }}">@lang('Refunded Bookings')</a>
+
+                            <a class="nav-link {{ request()->is('admin/all-booking/expired') ? 'active' : '' }}"
+                                href="{{ route('company.car.booking.all', ['status' => 'expired']) }}">@lang('Expired Bookings')</a>
                         </div>
                     </div>
                 </div>
