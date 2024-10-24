@@ -37,10 +37,6 @@ return new class extends Migration
             $table->string('cupon_number')->nullable();
             $table->string('discount_amount')->nullable();
             $table->text('message')->nullable();
-            $table->foreign('car_id')->references('id')->on('cars')->cascadeOnDelete();
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->foreign('deposit_id')->references('id')->on('deposits')->cascadeOnDelete();
-            $table->foreign('company_id')->references('id')->on('companies')->cascadeOnDelete();
             $table->timestamps();
         });
     }

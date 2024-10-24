@@ -158,7 +158,7 @@
                                                     value="{{ request()->date ?? '' }}" placeholder="@lang('Select Start Date')"
                                                     id="myID">
                                             </div>
-                                            <span id="inputDateError" class="text-danger"></span>
+                                            <span id="inputDateError" class="text-danger">{{ $errors->first('date') }}</span>
                                             <a type="submit" id="bookNowBtn" class="btn-1 mt-2">@lang('Proceed Booking')
                                                 <span></span></a>
                                         </div>

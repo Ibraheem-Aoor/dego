@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Interface\DepositableInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 
-class Booking extends Model
+class Booking extends Model implements DepositableInterface
 {
     use HasFactory, Prunable;
 
@@ -121,5 +122,16 @@ class Booking extends Model
     public function prunable(): Builder
     {
         return static::where('date', '<=', now()->subDays(5))->where('status', 0);
+    }
+
+
+    /**
+     * Return the title of the booked item.
+     *
+     * @return string
+     */
+    public function getBookedItemTitle()
+    {
+        return $this->package_title;
     }
 }

@@ -1295,3 +1295,14 @@ if (!function_exists('getDaysCountFromDatesString')) {
         return count($dates_array);
     }
 }
+if (!function_exists('getDatesArrayFromString')) {
+
+
+    function getDatesArrayFromString(string $dates): array
+    {
+        $result = array_map('trim', explode(',', $dates));
+        asort($result);
+        $result = array_values($result);
+        return $result;
+    }
+}

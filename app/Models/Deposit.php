@@ -13,8 +13,26 @@ class Deposit extends Model
 {
     use HasFactory, Prunable;
 
-    protected $fillable = ['depositable_id', 'depositable_type', 'user_id', 'payment_method_id', 'payment_method_currency', 'amount', 'percentage_charge',
-        'fixed_charge', 'payable_amount', 'base_currency_charge', 'payable_amount_in_base_currency', 'btc_amount', 'btc_wallet', 'payment_id', 'information', 'trx_id', 'status', 'note'];
+    protected $fillable = [
+        'depositable_id',
+        'depositable_type',
+        'user_id',
+        'payment_method_id',
+        'payment_method_currency',
+        'amount',
+        'percentage_charge',
+        'fixed_charge',
+        'payable_amount',
+        'base_currency_charge',
+        'payable_amount_in_base_currency',
+        'btc_amount',
+        'btc_wallet',
+        'payment_id',
+        'information',
+        'trx_id',
+        'status',
+        'note'
+    ];
 
 
     protected $casts = [
@@ -46,14 +64,14 @@ class Deposit extends Model
             $lastOrder = self::lockForUpdate()->orderBy('id', 'desc')->first();
 
             if ($lastOrder && isset($lastOrder->trx_id)) {
-                $lastOrderNumber = (int)filter_var($lastOrder->trx_id, FILTER_SANITIZE_NUMBER_INT);
+                $lastOrderNumber = (int) filter_var($lastOrder->trx_id, FILTER_SANITIZE_NUMBER_INT);
                 $newOrderNumber = $lastOrderNumber + 1;
             } else {
                 $newOrderNumber = strRandomNum(12);
             }
 
             while (self::where('trx_id', 'D' . $newOrderNumber)->exists()) {
-                $newOrderNumber = (int)$newOrderNumber + 1;
+                $newOrderNumber = (int) $newOrderNumber + 1;
             }
 
             return 'D' . $newOrderNumber;

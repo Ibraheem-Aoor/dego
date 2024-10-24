@@ -149,6 +149,7 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
             Route::post('add-review/store', [ReviewController::class, 'Store'])->name('review.store');
 
             Route::get('booking', [BookingController::class, 'bookingList'])->name('booking.list');
+            Route::get('car-booking', [BookingController::class, 'carBookingList'])->name('car_booking.list');
             Route::get('favourite-list', [FavouriteListController::class, 'favouriteList'])->name('favourite.list');
 
             Route::get('package/reaction', [FavouriteListController::class, 'packageReaction'])->name('package.reaction');

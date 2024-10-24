@@ -504,7 +504,7 @@ trait Notify
 
         $subject = ($subject == null) ? $templateObj->subject : $subject;
         $email_from = $basic->sender_email;
-        $admins = Admin::all();
+        $admins = Admin::all()->toArray();
         foreach ($admins as $admin) {
             $message = str_replace("[[name]]", $admin->username, $message);
             Mail::to($admin)->queue(new SendMail($email_from, $subject, $message));

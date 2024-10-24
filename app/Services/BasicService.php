@@ -4,6 +4,7 @@ namespace App\Services;
 
 
 use App\Models\Booking;
+use App\Models\CarBooking;
 use App\Models\Deposit;
 use App\Models\Fund;
 use App\Models\Package;
@@ -36,7 +37,7 @@ class BasicService
                 $deposit->save();
                 $user = $deposit->user;
 
-                if ($deposit->depositable_type == Booking::class) {
+                if ($deposit->depositable_type == Booking::class || $deposit->depositable_type == CarBooking::class) {
 
                     $transaction = new Transaction();
                     $transaction->user_id = $deposit->user_id;
@@ -51,9 +52,8 @@ class BasicService
                     $response = $deposit->depositable;
                     $response->status = 1;
                     $response->save();
-
                     $params = [
-                        'package_title' => $response->package_title
+                        'package_title' => $response->getBookedItemTitle()
                     ];
 
                     $action = [
@@ -66,7 +66,7 @@ class BasicService
 
                     $params = [
                         'user' => optional($deposit->user)->username,
-                        'package_title' => $response->package_title,
+                        'package_title' => $response->getBookedItemTitle(),
                     ];
                     $actionAdmin = [
                         "user" => optional($deposit->user)->firstname . ' ' . optional($deposit->user)->lastname,

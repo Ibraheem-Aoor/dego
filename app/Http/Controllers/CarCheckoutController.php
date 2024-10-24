@@ -58,28 +58,26 @@ class CarCheckoutController extends Controller
      */
     private function initBooking(array $data, $booking_id = null): CarBooking
     {
-        $instant = CarBooking::when(isset($booking_id), function ($query) use ($booking_id) {
-            $query->where('id', decrypt($booking_id));
-        })->first();
-        if (!$instant) {
-            $instant = CarBooking::query()->create([
-                'car_id' => $data['object']->id,
-                'user_id' => $data['user']->id,
-                'company_id' => $data['object']->company_id,
-                'status' => 0,
-                'total_price' => $data['object']->rent_price * $data['days_count'],
-                'fname' => $data['user']->firstname,
-                'lname' => $data['user']->lastname,
-                'email' => $data['user']->email,
-                'phone' => $data['user']->phone_code . $data['user']->phone,
-                'postal_code' => $data['user']->zip_code,
-                'city' => $data['user']->city,
-                'state' => $data['user']->state,
-                'country' => $data['user']->country,
-                'address_one' => $data['user']->address_one,
-                'address_two' => $data['user']->address_two,
-            ]);
-        }
+        $booking_id  = isset($booking_id) ? decrypt($booking_id) : null;
+        $instant = CarBooking::firstOrCreate([
+            'id' => $booking_id,
+        ],[
+            'car_id' => $data['object']->id,
+            'user_id' => $data['user']->id,
+            'company_id' => $data['object']->company_id,
+            'status' => 0,
+            'total_price' => $data['object']->rent_price * $data['days_count'],
+            'fname' => $data['user']->firstname,
+            'lname' => $data['user']->lastname,
+            'email' => $data['user']->email,
+            'phone' => $data['user']->phone_code . $data['user']->phone,
+            'postal_code' => $data['user']->zip_code,
+            'city' => $data['user']->city,
+            'state' => $data['user']->state,
+            'country' => $data['user']->country,
+            'address_one' => $data['user']->address_one,
+            'address_two' => $data['user']->address_two,
+        ]);
         $this->syncBookingWithItsDates($data['booking_dates'], $instant);
         return $instant;
     }
@@ -93,7 +91,7 @@ class CarCheckoutController extends Controller
      */
     private function getBookingDatesData(string $dates): array
     {
-        $data['booking_dates'] = array_map('trim', explode(',', $dates));
+        $data['booking_dates'] = getDatesArrayFromString($dates);
         $data['booking_dates_label'] = getBookingDatesLabel($data['booking_dates']);
         $data['days_count'] = count($data['booking_dates']);
         return $data;
@@ -174,7 +172,7 @@ class CarCheckoutController extends Controller
         } catch (Throwable $e) {
             dd($e);
             Log::error('ERROR in CarCheckoutController@storeBookingForPayment: ' . $e->getMessage());
-            return back()->with('error', __('Something went wrong'));
+            return redirect('/')->with('error', __('Something went wrong'));
         }
     }
 
@@ -191,8 +189,7 @@ class CarCheckoutController extends Controller
                 'car_id' => $car_booking->car_id,
             ];
         }
-        if(isset($data_to_sync))
-        {
+        if (isset($data_to_sync)) {
             $car_booking->bookingDates()->createMany($data_to_sync);
         }
     }
@@ -251,9 +248,9 @@ class CarCheckoutController extends Controller
             $currency = $request->supported_currency ?? $request->base_currency;
             $cryptoCurrency = $request->supported_crypto_currency;
             $booking = CarBooking::where('id', $request->booking)
-                ->where('user_id', getAuthUser('web')->id)->firstOr(function () {
-                    throw new \Exception('The booking record was not found.');
-                });
+            ->where('user_id', getAuthUser('web')->id)->firstOr(function () {
+                throw new \Exception('The booking record was not found.');
+            });
 
             $checkAmount = $this->checkAmountValidate($amount, $currency, $gateway, $cryptoCurrency);
             $checkAmountValidate = $this->validationCheck($checkAmount['amount'], $gateway, $currency, $cryptoCurrency);

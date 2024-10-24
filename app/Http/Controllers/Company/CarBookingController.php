@@ -101,7 +101,7 @@ class CarBookingController extends BaseCompanyController
                 $query->where('trx_id', 'LIKE', "%{$filterBookingId}%");
             })
             ->when($status == 'all', function ($query) {
-                return $query->whereIn('status', [1, 2, 4]);
+                return $query->whereIn('status', [1, 2, 4,0]);
             })
             ->when($status == 'pending', function ($query) {
                 return $query->where('status', 1)->whereDoesntHave('bookingDates', function ($bookingDates) {
@@ -140,8 +140,7 @@ class CarBookingController extends BaseCompanyController
                 return $query->whereHas('bookingDates', function ($q) use ($filterEnd) {
                     $q->whereDate('date', '<=', $filterEnd);
                 });
-            });
-
+            })->withConfirmedDeposit();
 
         return DataTables::of($Bookings)
             ->addColumn('checkbox', function ($item) {

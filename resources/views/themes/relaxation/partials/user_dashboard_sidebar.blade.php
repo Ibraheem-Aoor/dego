@@ -13,6 +13,12 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link collapsed {{ menuActive(['user.car_booking.list']) }}" href="{{ route("user.car_booking.list") }}">
+                <i class="fal fa-list"></i>
+                <span>@lang('Car Booking History')</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link collapsed {{ menuActive(['user.favourite.list']) }}" href="{{ route("user.favourite.list") }}">
                 <i class="fal fa-heart"></i>
                 <span>@lang('Favourite List')</span>

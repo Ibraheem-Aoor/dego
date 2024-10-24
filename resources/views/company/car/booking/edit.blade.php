@@ -17,7 +17,7 @@
                     </nav>
                     <h1 class="page-header-title">@lang('Booking Edit')</h1>
                     <div class="d-flex justify-content-start align-items-center gap-2">
-                        <p class="mb-0">{{ 'Booking Date ' . dateTime($booking->date) . '.' }}</p>
+                        <p class="mb-0">{{ 'Booking Date ' . dateTime($booking->maxBookingDate()) . '.' }}</p>
                         @if ($booking->status != 0 && $booking->status != 4 && $booking->status != 2)
                             <a class="refundBtn text-dark" href="javascript:void(0)"
                                 data-route="{{ route('admin.booking.refund', $booking->id) }}" data-bs-toggle="modal"
@@ -146,12 +146,12 @@
                         <div class="d-flex justify-content-start align-items-center gap-2">
                             <h4 class="card-header-title">@lang('Booking Information')</h4>
 
-                            @if ($booking->status == 1 && $booking->date > now())
+                            @if ($booking->status == 1 && $booking->maxBookingDate() > now())
                                 <span class="badge bg-soft-warning text-warning">
                                     <span class="legend-indicator bg-warning"></span>
                                     @lang('Pending')
                                 </span>
-                            @elseif($booking->status == 0 && $booking->date > now())
+                            @elseif($booking->status == 0 && $booking->maxBookingDate() > now())
                                 <span class="badge bg-soft-warning text-warning">
                                     <span class="legend-indicator bg-warning"></span>
                                     @lang('Payment Pending')
@@ -161,12 +161,12 @@
                                     <span class="legend-indicator bg-success"></span>
                                     @lang('Completed')
                                 </span>
-                            @elseif($booking->status == 4 && $booking->date > now())
+                            @elseif($booking->status == 4)
                                 <span class="badge bg-soft-secondary text-secondary">
                                     <span class="legend-indicator bg-secondary"></span>
                                     @lang('Refunded')
                                 </span>
-                            @elseif ($booking->date < now())
+                            @elseif ($booking->maxBookingDate() < now())
                                 <span class="badge bg-soft-danger text-danger">
                                     <span class="legend-indicator bg-danger"></span>
                                     @lang('Expired')
@@ -183,8 +183,8 @@
                     <div class="card-body">
                         <div class="card">
                             <div class="card-body">
-                                <form action="{{ route('admin.booking.update') }}" method="post"
-                                    enctype="multipart/form-data">
+                                {{-- <form action="{{ route('admin.booking.update') }}" method="post"
+                                    enctype="multipart/form-data"> --}}
                                     @csrf
 
                                     <input type="hidden" name="booking" value="{{ $booking->id }}" />
@@ -197,7 +197,7 @@
                                                 <input type="text" class="form-control" name="name" id="nameLabel"
                                                     placeholder="e.g dhaka" aria-label="name"
                                                     value="{{ old('name', $booking->car->name) }}"
-                                                    {{ $booking->status == 1 && $booking->date > now() ? '' : 'disabled' }}>
+                                                    {{  'disabled' }}>
                                                 @error('name')
                                                     <span class="invalid-feedback d-block" role="alert">
                                                         <strong>{{ $message }}</strong>
@@ -215,7 +215,7 @@
                                                         id="TotalPriceLabel"
                                                         value="{{ old('total_price', $booking->total_price) }}"
                                                         placeholder="e.g 500" aria-label="price"
-                                                        {{ $booking->status == 1 && $booking->date > now() ? '' : 'disabled' }}>
+                                                        {{  'disabled' }}>
                                                     <h5 class="form-control wid2 mb-0">{{ basicControl()->base_currency }}
                                                     </h5>
                                                 </div>
@@ -259,7 +259,7 @@
                                                 <input type="text" name="startPoint" id="statrtPoint"
                                                     class="form-control" placeholder="@lang('Start Point')"
                                                     value="{{ old('startPoint', optional($booking->car)->pickup_location) }}"
-                                                    {{ $booking->status == 1 && $booking->date > now() ? '' : 'disabled' }}>
+                                                    {{  'disabled' }}>
                                                 @error('startPoint')
                                                     <span class="invalid-feedback d-block" role="alert">
                                                         <strong>{{ $message }}</strong>
@@ -273,7 +273,7 @@
                                                 <input type="text" name="startMessage" id="startMessage"
                                                     class="form-control" placeholder="@lang('Messages')"
                                                     value="{{ old('startMessage', optional($booking->car)->drop_location) }}"
-                                                    {{ $booking->status == 1 && $booking->date > now() ? '' : 'disabled' }}>
+                                                    {{  'disabled' }}>
                                                 @error('startMessage')
                                                     <span class="invalid-feedback d-block" role="alert">
                                                         <strong>{{ $message }}</strong>
@@ -282,10 +282,10 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if ($booking->status == 1 && $booking->date > now())
-                                        <button type="submit" class="btn btn-primary">@lang('Save Changes')</button>
+                                    @if ($booking->status == 1 && $booking->maxBookingDate() > now())
+                                        {{-- <button type="submit" class="btn btn-primary">@lang('Save Changes')</button> --}}
                                     @endif
-                                </form>
+                                {{-- </form> --}}
                             </div>
                         </div>
                     </div>

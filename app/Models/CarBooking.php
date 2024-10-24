@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Interface\DepositableInterface;
 use App\Models\Scopes\BelongsToCompanyScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Str;
 
-class CarBooking extends Model
+class CarBooking extends Model implements DepositableInterface
 {
     use HasFactory;
 
@@ -105,10 +106,39 @@ class CarBooking extends Model
         return $this->bookingDates()->max('date');
     }
 
-    public function getDuration(): int
+    public function getDuration($with_label = false)
     {
         $dates = $this->bookingDates()->pluck('date')->toArray();
-        return count($dates);
+        return $with_label ? count($dates) . ' ' . __('Days') : count($dates);
     }
+
+    /**
+     * Scope a query to only include bookings with a confirmed deposit.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithConfirmedDeposit($query)
+    {
+        return $query->whereHas('depositable', function ($query) {
+            $query->where('status', 1);
+        });
+    }
+
+
+    /**
+     * Return the title of the booked item.
+     *
+     * @return string
+     */
+    public function getBookedItemTitle()
+    {
+        return $this->car->name;
+    }
+    public function getActionLinkForAdmin()
+    {
+        // return route();  
+    }
+
 
 }
