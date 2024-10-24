@@ -30,6 +30,7 @@ use App\Http\Controllers\InAppNotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminProfileSettingController;
 use App\Http\Controllers\Admin\AgentController;
+use App\Http\Controllers\Admin\BaseUserController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\MaintenanceModeController;
 use App\Http\Controllers\Admin\NotificationTemplateController;
@@ -368,8 +369,27 @@ Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin
             Route::get('mail-all-user', [AgentController::class, 'mailAllUser'])->name('mail.all.user');
             Route::get('/companies/{id}', [AgentController::class, 'companies'])->name('companies');
             Route::get('/companies/search/{agent}', [AgentController::class, 'companiesSearch'])->name('companies.search');
+        });
+        Route::prefix('baseuser')->as('baseuser.')->group(function () {
+            Route::get('list', [BaseUserController::class, 'index'])->name('index');
+            Route::get('add', [BaseUserController::class, 'agentAdd'])->name('add');
+            Route::post('store', [BaseUserController::class, 'store'])->name('store');
+            Route::get('search', [BaseUserController::class, 'search'])->name('search');
+            Route::get('edit/{id}', [BaseUserController::class, 'userEdit'])->name('edit');
+            Route::post('update/{id}', [BaseUserController::class, 'userUpdate'])->name('update');
+            Route::post('block-profile/{id}', [BaseUserController::class, 'blockProfile'])->name('block.profile');
+            Route::post('delete-multiple', [BaseUserController::class, 'deleteMultiple'])->name('delete.multiple');
 
+            Route::post('email/{id}', [BaseUserController::class, 'EmailUpdate'])->name('email.update');
+            Route::post('username/{id}', [BaseUserController::class, 'usernameUpdate'])->name('username.update');
+            Route::post('password/{id}', [BaseUserController::class, 'passwordUpdate'])->name('password.update');
+            Route::get('view-profile/{id}', [BaseUserController::class, 'userViewProfile'])->name('view.profile');
 
+            Route::get('send-email/{id}', [BaseUserController::class, 'sendEmail'])->name('send.email');
+            Route::post('send-email/{id?}', [BaseUserController::class, 'sendMailUser'])->name('email.send');
+            Route::get('mail-all-user', [BaseUserController::class, 'mailAllUser'])->name('mail.all.user');
+            Route::get('/companies/{id}', [BaseUserController::class, 'companies'])->name('companies');
+            Route::get('/companies/search/{agent}', [BaseUserController::class, 'companiesSearch'])->name('companies.search');
         });
 
         /* ====== Transaction Log =====*/

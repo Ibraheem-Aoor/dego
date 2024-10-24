@@ -276,6 +276,35 @@
                                href="{{ route("admin.mail.all.user") }}">@lang('Mail To Agents')</a>
                         </div>
                     </div>
+                    {{-- Drivers Panel --}}
+                    <span class="dropdown-header mt-4"> @lang("Drive Panel")</span>
+                    <small class="bi-three-dots nav-subtitle-replacer"></small>
+
+                    <div class="nav-item">
+                        <a class="nav-link dropdown-toggle {{ menuActive(['admin.baseuser.index'], 3) }}"
+                           href="#navbarVerticalDriverPanelMenu"
+                           role="button"
+                           data-bs-toggle="collapse"
+                           data-bs-target="#navbarVerticalDriverPanelMenu"
+                           aria-expanded="false"
+                           aria-controls="navbarVerticalDriverPanelMenu">
+                            <i class="bi-people nav-icon"></i>
+                            <span class="nav-link-title">@lang('Driver Management')</span>
+                        </a>
+                        <div id="navbarVerticalDriverPanelMenu"
+                             class="nav-collapse collapse {{ menuActive(['admin.baseuser.index','admin.baseuser.add','admin.baseuser.edit',
+                                                                        'admin.baseuser.view.profile',
+                                                                        ], 2) }}"
+                             data-bs-parent="#navbarVerticalDriverPanelMenu">
+
+                            <a class="nav-link {{ menuActive(['admin.baseuser.index']) }}" href="{{ route('admin.baseuser.index' , ['model' => 'Driver']) }}">
+                                @lang('All Drivers')
+                            </a>
+
+                            <a class="nav-link {{ menuActive(['admin.baseuser.mail.all.user']) }}"
+                               href="{{ route("admin.baseuser.mail.all.user" , ['model' => 'Driver']) }}">@lang('Mail To Drivers')</a>
+                        </div>
+                    </div>
 
                     <span class="dropdown-header mt-4">@lang("Others Settings")</span>
                     <div class="nav-item">

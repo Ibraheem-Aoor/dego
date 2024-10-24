@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\HasLastSeenAttribute;
+use App\Traits\HasProfilePicture;
 use App\Traits\Notify;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Agent extends Authenticatable
 {
-    use HasFactory, Notifiable, Notify , SoftDeletes;
+    use HasFactory, Notifiable, Notify , SoftDeletes , HasProfilePicture , HasLastSeenAttribute;
     protected $fillable = [
         'name',
         'username',
@@ -28,6 +30,7 @@ class Agent extends Authenticatable
         'last_login',
         'last_seen',
     ];
+    protected $appends = ['last-seen-activity'];
 
     protected $hidden = [
         'remember_token',
@@ -47,27 +50,7 @@ class Agent extends Authenticatable
         return $this->hasMany(Company::class);
     }
 
-    public function profilePicture()
-    {
-        $image = $this->image;
-        if (!$image) {
-            $active = $this->LastSeenActivity == false ? 'warning' : 'success';
-            $firstLetter = substr($this->name, 0, 1);
-            return '<div class="avatar avatar-sm avatar-soft-primary avatar-circle">
-                        <span class="avatar-initials">' . $firstLetter . '</span>
-                        <span class="avatar-status avatar-sm-status avatar-status-' . $active . '"></span>
-                     </div>';
 
-        } else {
-            $url = getFile($this->image_driver, $this->image);
-            $active = $this->LastSeenActivity == false ? 'warning' : 'success';
-            return '<div class="avatar avatar-sm avatar-circle">
-                        <img class="avatar-img" src="' . $url . '" alt="Image Description">
-                        <span class="avatar-status avatar-sm-status avatar-status-' . $active . '"></span>
-                     </div>';
-
-        }
-    }
 
     public function sendPasswordResetNotification($token)
     {
