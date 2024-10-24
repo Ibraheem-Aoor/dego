@@ -1261,7 +1261,7 @@ if (!function_exists('getCurrentGuard')) {
         return Auth::guard('admin')->check() ?
             'admin'
             :
-            (Auth::guard('agent')->check() ? 'agent' : (Auth::guard('company')->check() ? 'company' : 'web'));
+            (Auth::guard('agent')->check() ? 'agent' : (Auth::guard('company')->check() ? 'company' : (Auth::guard('driver')->check() ? 'driver' : 'web')));
     }
 }
 if (!function_exists('formatBookingDatesString')) {

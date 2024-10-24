@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
-
-class Driver extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable;
+class Driver extends  Authenticatable
 {
     use HasFactory, Notifiable, Notify, SoftDeletes, HasProfilePicture, HasLastSeenAttribute;
     protected $fillable = [
