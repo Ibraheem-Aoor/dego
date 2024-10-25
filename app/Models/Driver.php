@@ -26,6 +26,8 @@ class Driver extends  Authenticatable
         'phone',
         'last_login',
         'last_seen',
+        'to_airport_price',
+        'from_airport_price'
     ];
     protected $appends = ['last-seen-activity'];
 

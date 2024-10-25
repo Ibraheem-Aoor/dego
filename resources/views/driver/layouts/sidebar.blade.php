@@ -4,7 +4,6 @@
     {{ in_array(session()->get('themeMode'), [null, 'auto']) ? 'navbar-dark bg-dark ' : 'navbar-light bg-white' }}">
     <div class="navbar-vertical-container">
         <div class="navbar-vertical-footer-offset">
-            DRIVER DASHBAOR
             <!-- Logo -->
             <a class="navbar-brand" href="{{ route('admin.dashboard') }}" aria-label="{{ $basicControl->site_title }}">
                 <img class="navbar-brand-logo navbar-brand-logo-auto"
@@ -52,24 +51,22 @@
                     <small class="bi-three-dots nav-subtitle-replacer"></small>
 
                     <div class="nav-item">
-                        <a class="nav-link dropdown-toggle {{ menuActive(['agent.company.index'], 3) }}"
+                        <a class="nav-link dropdown-toggle {{ menuActive(['driver.price.index'], 3) }}"
                             href="#navbarVerticalUserPanelMenu" role="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarVerticalUserPanelMenu" aria-expanded="false"
                             aria-controls="navbarVerticalUserPanelMenu">
                             <i class="bi-people nav-icon"></i>
-                            <span class="nav-link-title">@lang('Company Management')</span>
+                            <span class="nav-link-title">@lang('My Prices')</span>
                         </a>
                         <div id="navbarVerticalUserPanelMenu"
-                            class="nav-collapse collapse {{ menuActive(['agent.company.index', 'agent.company.add', 'agent.company.edit', 'agent.company.view.profile' , 'agent.company.mail.all'], 2) }}"
+                            class="nav-collapse collapse {{ menuActive(['driver.price.index', 'driver.price.add', 'driver.price.edit'], 2) }}"
                             data-bs-parent="#navbarVerticalUserPanelMenu">
 
-                            <a class="nav-link {{ menuActive(['agent.company.index']) }}"
-                                href="{{ route('agent.company.index') }}">
-                                @lang('All Companies')
+                            <a class="nav-link {{ menuActive(['driver.price.index']) }}"
+                                href="{{ route('driver.price.index') }}">
+                                @lang('Prices')
                             </a>
 
-                            <a class="nav-link {{ menuActive(['agent.company.mail.all']) }}"
-                                href="{{ route('agent.company.mail.all') }}">@lang('Mail To Companies')</a>
                         </div>
                     </div>
                 </div>

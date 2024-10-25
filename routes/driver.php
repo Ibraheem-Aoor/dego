@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\ResetPasswordController;
 use App\Http\Controllers\Agent\CompanyController;
 use App\Http\Controllers\Agent\DashboardController;
+use App\Http\Controllers\Driver\PriceController;
 use Illuminate\Support\Facades\Route;
 
 #---------- AUTH ROUTES ---------#
@@ -21,4 +22,10 @@ Route::post('password/reset', [ResetPasswordController::class, 'reset'])
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::post('save-token', [DashboardController::class, 'saveToken'])->name('save.token');
+
+Route::prefix('price')->as('price.')->group(function () {
+    Route::get('index', [PriceController::class, 'index'])->name('index');
+    Route::post('update', [PriceController::class, 'update'])->name('update');
+});
+
 

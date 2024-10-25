@@ -9,4 +9,6 @@ class BaseDriverController extends Controller
 {
     protected $base_route_path = 'driver.';
     protected $base_view_path = 'driver.';
+
+    protected $page_title;
 }
