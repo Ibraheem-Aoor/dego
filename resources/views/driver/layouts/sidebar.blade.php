@@ -49,7 +49,7 @@
                     {{-- Company Panel --}}
                     <span class="dropdown-header mt-4"> @lang('Company Panel')</span>
                     <small class="bi-three-dots nav-subtitle-replacer"></small>
-
+                    {{-- Manage Price --}}
                     <div class="nav-item">
                         <a class="nav-link dropdown-toggle {{ menuActive(['driver.price.index'], 3) }}"
                             href="#navbarVerticalUserPanelMenu" role="button" data-bs-toggle="collapse"
@@ -68,6 +68,28 @@
                             </a>
 
                         </div>
+
+                    </div>
+                    {{-- Manage Ride Destinations --}}
+                    <div class="nav-item">
+                        <a class="nav-link dropdown-toggle {{ menuActive(['driver.ride.index'], 3) }}"
+                            href="#navbarVerticalRidePanelMenu" role="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarVerticalRidePanelMenu" aria-expanded="false"
+                            aria-controls="navbarVerticalRidePanelMenu">
+                            <i class="bi-people nav-icon"></i>
+                            <span class="nav-link-title">@lang('Manage Ride Destinations')</span>
+                        </a>
+                        <div id="navbarVerticalRidePanelMenu"
+                        class="nav-collapse collapse {{ menuActive(['driver.ride.index', 'driver.ride.add', 'driver.ride.edit'], 2) }}"
+                        data-bs-parent="#navbarVerticalRidePanelMenu">
+
+                        <a class="nav-link {{ menuActive(['driver.ride.index']) }}"
+                            href="{{ route('driver.ride.index') }}">
+                            @lang('Ride Destinations')
+                        </a>
+
+                    </div>
+
                     </div>
                 </div>
             </div>
