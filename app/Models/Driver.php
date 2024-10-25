@@ -7,6 +7,7 @@ use App\Traits\HasProfilePicture;
 use App\Traits\Notify;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,6 +15,8 @@ class Driver extends  Authenticatable
 {
     use HasFactory, Notifiable, Notify, SoftDeletes, HasProfilePicture, HasLastSeenAttribute;
     protected $fillable = [
+        'thumb',
+        'thumb_driver',
         'name',
         'username',
         'email',
@@ -35,4 +38,9 @@ class Driver extends  Authenticatable
         'remember_token',
         'password',
     ];
+
+    public function car(): HasOne
+    {
+        return $this->hasOne(DriverCar::class);
+    }
 }

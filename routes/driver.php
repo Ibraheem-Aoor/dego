@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\ResetPasswordController;
 use App\Http\Controllers\Agent\CompanyController;
 use App\Http\Controllers\Agent\DashboardController;
+use App\Http\Controllers\Driver\CarController;
 use App\Http\Controllers\Driver\PriceController;
 use App\Http\Controllers\Driver\RideController;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,11 @@ Route::post('save-token', [DashboardController::class, 'saveToken'])->name('save
 Route::prefix('price')->as('price.')->group(function () {
     Route::get('index', [PriceController::class, 'index'])->name('index');
     Route::post('update', [PriceController::class, 'update'])->name('update');
+});
+// Manage Price
+Route::prefix('car')->as('car.')->group(function () {
+    Route::get('index', [CarController::class, 'index'])->name('index');
+    Route::post('update', [CarController::class, 'update'])->name('update');
 });
 
 // Manage Ride Destinations

@@ -70,6 +70,13 @@
                         </div>
 
                     </div>
+                    <div class="nav-item">
+                        <a class="nav-link {{ menuActive(['driver.car.index']) }}"
+                            href="{{ route('driver.car.index') }}">
+                            <i class="bi-house-door nav-icon"></i>
+                            <span class="nav-link-title">@lang('My Car')</span>
+                        </a>
+                    </div>
                     {{-- Manage Ride Destinations --}}
                     <div class="nav-item">
                         <a class="nav-link dropdown-toggle {{ menuActive(['driver.ride.index'], 3) }}"
