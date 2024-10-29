@@ -87,6 +87,7 @@ Route::middleware('auth:company')->group(function () {
     Route::get('destiantion/top-visited', [BookingController::class, 'topVisitedDestination'])->name('top.visited.destination');
 
 
+    // Car Bookings
     Route::prefix('car')->as('car.')->group(function () {
         Route::get('list', [CarController::class, 'list'])->name('list');
         Route::get('add', [CarController::class, 'add'])->name('add');

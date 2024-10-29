@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Interface\DepositableInterface;
+use App\Models\Scopes\BelongsToCompanyScope;
+use App\Models\Scopes\BelongsToDriverScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
+use Str;
 
 class DriverRideBooking extends Model implements DepositableInterface
 {
@@ -15,7 +18,19 @@ class DriverRideBooking extends Model implements DepositableInterface
 
     public function driver(): BelongsTo
     {
-        return $this->belongsTo(Driver::class, 'driver_id');
+        return $this->belongsTo(Driver::class, foreignKey: 'driver_id');
+    }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, foreignKey: 'driver_id');
+    }
+    protected static function booted(): void
+    {
+        static::creating(function (DriverRideBooking $booking) {
+            $booking->uid = Str::orderedUuid();
+        });
+        static::addGlobalScope(BelongsToDriverScope::class);
+
     }
 
     public static function boot(): void
@@ -56,6 +71,29 @@ class DriverRideBooking extends Model implements DepositableInterface
     public function getBookedItemTitle()
     {
         return $this->driver->car->name;
+    }
+
+     /**
+     * The deposit associated with the driver ride booking.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
+    public function depositable()
+    {
+        return $this->morphOne(Deposit::class, 'depositable');
+    }
+
+      /**
+     * Scope a query to only include bookings with a confirmed deposit.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWithConfirmedDeposit($query)
+    {
+        return $query->whereHas('depositable', function ($query) {
+            $query->where('status', 1);
+        });
     }
 
 }

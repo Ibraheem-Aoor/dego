@@ -7,6 +7,7 @@ use App\Http\Controllers\Agent\CompanyController;
 use App\Http\Controllers\Agent\DashboardController;
 use App\Http\Controllers\Driver\CarController;
 use App\Http\Controllers\Driver\PriceController;
+use App\Http\Controllers\Driver\RideBookingController;
 use App\Http\Controllers\Driver\RideController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,6 +56,18 @@ Route::prefix('ride')->as('ride.')->group(function () {
     Route::get('send-email/{id}', [RideController::class, 'sendEmail'])->name('send.email');
     Route::post('send-email/{id?}', [RideController::class, 'sendMailUser'])->name('email.send');
     Route::get('mail-all-user', [RideController::class, 'mailAllUser'])->name('mail.all');
+    // Ride Booking
+    Route::prefix('booking')->as('booking.')->group(function () {
+        Route::get('all-bookings', [RideBookingController::class, 'all_booking'])->name('all');
+        Route::get('all-bookings/search', [RideBookingController::class, 'all_booking_search'])->name('search');
+        Route::get('edit/{id}', [RideBookingController::class, 'bookingEdit'])->name('edit');
+        Route::get('refund/{id}', [RideBookingController::class, 'bookingRefund'])->name('refund');
+        Route::post('completed/{id}', [RideBookingController::class, 'complete'])->name('action');
+        Route::any('booking/refund-multiple', [RideBookingController::class, 'refundMultiple'])->name('refund.multiple');
+        Route::any('booking/completed-multiple', [RideBookingController::class, 'completedMultiple'])->name('completed.multiple');
+
+
+    });
 });
 
 

@@ -5,13 +5,13 @@
     <div class="navbar-vertical-container">
         <div class="navbar-vertical-footer-offset">
             <!-- Logo -->
-            <a class="navbar-brand" href="{{ route('admin.dashboard') }}" aria-label="{{ $basicControl->site_title }}">
+            <a class="navbar-brand" href="{{ route('driver.dashboard') }}" aria-label="{{ $basicControl->site_title }}">
                 <img class="navbar-brand-logo navbar-brand-logo-auto"
-                    src="{{ getFile(in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->admin_dark_mode_logo_driver : $basicControl->admin_logo_driver, in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->admin_dark_mode_logo : $basicControl->admin_logo, true) }}"
+                    src="{{ getFile(in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->driver_dark_mode_logo_driver : $basicControl->driver_logo_driver, in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->driver_dark_mode_logo : $basicControl->driver_logo, true) }}"
                     alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="default">
 
                 <img class="navbar-brand-logo"
-                    src="{{ getFile($basicControl->admin_dark_mode_logo_driver, $basicControl->admin_dark_mode_logo, true) }}"
+                    src="{{ getFile($basicControl->driver_dark_mode_logo_driver, $basicControl->driver_dark_mode_logo, true) }}"
                     alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="dark">
 
                 <img class="navbar-brand-logo-mini"
@@ -40,8 +40,8 @@
             <div class="navbar-vertical-content">
                 <div id="navbarVerticalMenu" class="nav nav-pills nav-vertical card-navbar-nav">
                     <div class="nav-item">
-                        <a class="nav-link {{ menuActive(['admin.dashboard']) }}"
-                            href="{{ route('admin.dashboard') }}">
+                        <a class="nav-link {{ menuActive(['driver.dashboard']) }}"
+                            href="{{ route('driver.dashboard') }}">
                             <i class="bi-house-door nav-icon"></i>
                             <span class="nav-link-title">@lang('Dashboard')</span>
                         </a>
@@ -87,16 +87,43 @@
                             <span class="nav-link-title">@lang('Manage Ride Destinations')</span>
                         </a>
                         <div id="navbarVerticalRidePanelMenu"
-                        class="nav-collapse collapse {{ menuActive(['driver.ride.index', 'driver.ride.add', 'driver.ride.edit'], 2) }}"
-                        data-bs-parent="#navbarVerticalRidePanelMenu">
+                            class="nav-collapse collapse {{ menuActive(['driver.ride.index', 'driver.ride.add', 'driver.ride.edit'], 2) }}"
+                            data-bs-parent="#navbarVerticalRidePanelMenu">
 
-                        <a class="nav-link {{ menuActive(['driver.ride.index']) }}"
-                            href="{{ route('driver.ride.index') }}">
-                            @lang('Ride Destinations')
-                        </a>
+                            <a class="nav-link {{ menuActive(['driver.ride.index']) }}"
+                                href="{{ route('driver.ride.index') }}">
+                                @lang('Ride Destinations')
+                            </a>
 
+                        </div>
                     </div>
+                    {{-- Manage Bookings --}}
+                    <div class="nav-item">
+                        <a class="nav-link dropdown-toggle {{ menuActive(['driver.all.booking', 'driver.all.booking.search', 'driver.booking.edit'], 3) }}"
+                            href="#navbarVerticalCarBookingMenu" role="button" data-bs-toggle="collapse"
+                            data-bs-target="#navbarVerticalCarBookingMenu" aria-expanded="false"
+                            aria-controls="navbarVerticalCarBookingMenu">
+                            <i class="bi bi-boxes nav-icon"></i>
+                            <span class="nav-link-title">@lang('Car Bookings')</span>
+                        </a>
+                        <div id="navbarVerticalCarBookingMenu"
+                            class="nav-collapse collapse {{ menuActive(['driver.all.booking', 'driver.all.booking.search', 'driver.booking.edit'], 2) }}"
+                            data-bs-parent="#navbarVerticalCarBookingMenu">
+                            <a class="nav-link {{ request()->is('driver/all-booking/all') ? 'active' : '' }}"
+                                href="{{ route('driver.ride.booking.all', ['status' => 'all']) }}">@lang('All Bookings')</a>
 
+                            <a class="nav-link {{ request()->is('driver/all-booking/pending') ? 'active' : '' }}"
+                                href="{{ route('driver.ride.booking.all', ['status' => 'pending']) }}">@lang('Pending Bookings')</a>
+
+                            <a class="nav-link {{ request()->is('driver/all-booking/completed') ? 'active' : '' }}"
+                                href="{{ route('driver.ride.booking.all', ['status' => 'completed']) }}">@lang('Completed Bookings')</a>
+
+                            <a class="nav-link {{ request()->is('driver/all-booking/refunded') ? 'active' : '' }}"
+                                href="{{ route('driver.ride.booking.all', ['status' => 'refunded']) }}">@lang('Refunded Bookings')</a>
+
+                            <a class="nav-link {{ request()->is('driver/all-booking/expired') ? 'active' : '' }}"
+                                href="{{ route('driver.ride.booking.all', ['status' => 'expired']) }}">@lang('Expired Bookings')</a>
+                        </div>
                     </div>
                 </div>
             </div>

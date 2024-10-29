@@ -90,6 +90,8 @@ class DriverCheckoutController extends Controller
             'country' => $data['user']->country,
             'address_one' => $data['user']->address_one,
             'address_two' => $data['user']->address_two,
+            'latitude' => $data['latitude'],
+            'longitude' => $data['longitude'],
             'date' => $data['date'],
         ]);
         return $instant;
