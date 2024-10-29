@@ -28,6 +28,7 @@ class DashboardController extends Controller
 
     public function index()
     {
+        $auth_company = getAuthUser('company');
         $data['firebaseNotify'] = config('firebase');
         $data['latestUser'] = User::latest()->limit(5)->get();
         $statistics['schedule'] = $this->dayList();
@@ -36,7 +37,7 @@ class DashboardController extends Controller
             ->first();
         $data['booking'] = $bookingSummary->booking_count;
         $data['totalAmount'] = $bookingSummary->total_amount;
-        $carBookingSummary = CarBooking::selectRaw('COUNT(*) as booking_count, SUM(total_price) as total_amount')
+        $carBookingSummary = CarBooking::query()->whereBelongsTo($auth_company)->selectRaw('COUNT(*) as booking_count, SUM(total_price) as total_amount')
             ->first();
         $data['car_booking'] = $carBookingSummary->booking_count;
         $data['car_booking_totalAmount'] = $carBookingSummary->total_amount;
@@ -105,7 +106,7 @@ class DashboardController extends Controller
 
     public function saveToken(Request $request)
     {
-        $admin = Auth::guard('admin')->user()
+        $admin = Auth::guard('company')->user()
             ->fireBaseToken()
             ->create([
                 'token' => $request->token,
@@ -178,34 +179,6 @@ class DashboardController extends Controller
         return response()->json(['userRecord' => $userRecord, 'current_month_data_dates' => $current_month_data_dates, 'current_month_datas' => $current_month_datas]);
     }
 
-    public function chartTicketRecords()
-    {
-        $currentMonth = Carbon::now()->format('Y-m');
-        $ticketRecord = collect(SupportTicket::selectRaw('COUNT(id) AS totalTickets')
-            ->selectRaw('COUNT(CASE WHEN DATE(created_at) = CURDATE() THEN id END) AS currentDateTicketsCount')
-            ->selectRaw('COUNT(CASE WHEN DATE(created_at) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) THEN id END) AS previousDateTicketsCount')
-            ->selectRaw('count(CASE WHEN status = 2  THEN status END) AS replied')
-            ->selectRaw('count(CASE WHEN status = 1  THEN status END) AS answered')
-            ->selectRaw('count(CASE WHEN status = 0  THEN status END) AS pending')
-            ->get()
-            ->toArray())->collapse();
-
-        $followupGrap = $this->followupGrap($ticketRecord['currentDateTicketsCount'], $ticketRecord['previousDateTicketsCount']);
-        $ticketRecord->put('followupGrapClass', $followupGrap['class']);
-        $ticketRecord->put('followupGrap', $followupGrap['percentage']);
-
-        $current_month_data = DB::table('support_tickets')
-            ->select(DB::raw('DATE_FORMAT(created_at,"%e %b") as date'), DB::raw('count(*) as count'))
-            ->where(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'), $currentMonth)
-            ->orderBy('created_at', 'asc')
-            ->groupBy('date')
-            ->get();
-
-        $current_month_data_dates = $current_month_data->pluck('date');
-        $current_month_datas = $current_month_data->pluck('count');
-        $ticketRecord['chartPercentageIncDec'] = fractionNumber($ticketRecord['totalTickets'] - $ticketRecord['currentDateTicketsCount'], false);
-        return response()->json(['ticketRecord' => $ticketRecord, 'current_month_data_dates' => $current_month_data_dates, 'current_month_datas' => $current_month_datas]);
-    }
 
 
     public function chartTransactionRecords()
@@ -265,27 +238,6 @@ class DashboardController extends Controller
     }
 
 
-    public function chartLoginHistory()
-    {
-        $userLoginsData = DB::table('user_logins')
-            ->whereDate('created_at', '>=', now()->subDays(30))
-            ->select('browser', 'os', 'get_device')
-            ->get();
-
-        $userLoginsBrowserData = $userLoginsData->groupBy('browser')->map->count();
-        $data['browserKeys'] = $userLoginsBrowserData->keys();
-        $data['browserValue'] = $userLoginsBrowserData->values();
-
-        $userLoginsOSData = $userLoginsData->groupBy('os')->map->count();
-        $data['osKeys'] = $userLoginsOSData->keys();
-        $data['osValue'] = $userLoginsOSData->values();
-
-        $userLoginsDeviceData = $userLoginsData->groupBy('get_device')->map->count();
-        $data['deviceKeys'] = $userLoginsDeviceData->keys();
-        $data['deviceValue'] = $userLoginsDeviceData->values();
-
-        return response()->json(['loginPerformance' => $data]);
-    }
 
 
     public function totalBooking(Request $request)
@@ -294,7 +246,8 @@ class DashboardController extends Controller
         $model_name = '\\App\\Models\\'. $request->model;
         $model = new  $model_name();
         $currentMonth = now()->format('Y-m');
-        $propertyBooking = $model::query()->select(
+        $auth_company = getAuthUser('company');
+        $propertyBooking = $model::query()->whereBelongsTo($auth_company)->select(
             DB::raw('DAY(created_at) as day'),
             DB::raw('COUNT(*) as total_sales'),
             DB::raw('SUM(total_price) as total_amount')
