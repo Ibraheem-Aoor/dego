@@ -22,6 +22,8 @@ use App\Http\Controllers\User\SubscriberController;
 use App\Http\Controllers\User\NotificationController;
 use App\Http\Controllers\User\FavouriteListController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DriverCheckoutController;
+use App\Http\Controllers\DriverController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\User\KycVerificationController;
 use App\Http\Controllers\User\BookingController;
@@ -128,6 +130,15 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
                     Route::any('make-payment', [CarCheckoutController::class, 'makePayment'])->name('make.payment');
 
                 });
+                // User Driver Ride Booking Routes
+                Route::prefix('driver')->as('driver.')->group(function () {
+                    Route::get('/cehckout-form/{id}/{booking_id?}', [DriverCheckoutController::class, 'checkoutForm'])->name('checkout.form');
+                    Route::post('checkout/payment-booking/{id}/{booking_id}', [DriverCheckoutController::class, 'storeBookingForPayment'])->name('checkout.form.store_booking');
+                    Route::post('update-date', [DriverCheckoutController::class, 'updateDate'])->name('date.update');
+                    Route::get('checkout/payment/{id}', [DriverCheckoutController::class, 'checkoutPaymentForm'])->name('checkout.form.payment.form');
+                    Route::any('make-payment', [DriverCheckoutController::class, 'makePayment'])->name('make.payment');
+
+                });
 
             });
 
@@ -198,7 +209,11 @@ Route::group(['middleware' => ['maintenanceMode']], function () use ($basicContr
     Route::prefix('cars')->as('car.')->group(function () {
         Route::get('/', [CarController::class, 'carList'])->name('index');
         Route::get('details/{car}', [CarController::class, 'carDetails'])->name('details');
-        // Route::get('package-search', [PackageController::class, 'packageSearch'])->name('package.search');
+    });
+    // Drivers
+    Route::prefix('drivers')->as('driver.')->group(function () {
+        Route::get('/', [DriverController::class, 'carList'])->name('index');
+        Route::get('details/{driver}', [DriverController::class, 'carDetails'])->name('details');
     });
 
     Route::get('live-data', [FrontendController::class, 'liveData'])->name('live.data');

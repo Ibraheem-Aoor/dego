@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\InvalidLocation;
 use App\Models\BasicControl;
 use App\Models\ManageMenu;
 use App\Models\Page;
@@ -1081,10 +1082,12 @@ function getMap($city, $state, $country, $api, $addr = null)
 
 
     $result = app('geocoder')->geocode($address)->get();
+    if($result->isEmpty()){
+        throw new InvalidLocation(__('Invalid Location'));
+    }
     $coordinates = $result[0]->getCoordinates();
     $lat = $coordinates->getLatitude();
     $long = $coordinates->getLongitude();
-
     return [$lat, $long];
 }
 

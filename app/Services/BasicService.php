@@ -6,6 +6,7 @@ namespace App\Services;
 use App\Models\Booking;
 use App\Models\CarBooking;
 use App\Models\Deposit;
+use App\Models\DriverRideBooking;
 use App\Models\Fund;
 use App\Models\Package;
 use App\Models\Transaction;
@@ -36,8 +37,8 @@ class BasicService
                 $deposit->status = 1;
                 $deposit->save();
                 $user = $deposit->user;
-
-                if ($deposit->depositable_type == Booking::class || $deposit->depositable_type == CarBooking::class) {
+                $depositable_allowed_types = [Booking::class , CarBooking::class , DriverRideBooking::class];
+                if (in_array($deposit->depositable_type , $depositable_allowed_types)) {
 
                     $transaction = new Transaction();
                     $transaction->user_id = $deposit->user_id;

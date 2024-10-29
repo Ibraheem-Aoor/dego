@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\InvalidLocation;
 use App\Http\Controllers\Controller;
 use App\Models\City;
 use App\Models\Country;
@@ -27,8 +28,8 @@ class DestinationController extends Controller
                  SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as totalInactiveDestination,
                  SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as totalCreatedToday,
                  SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as totalCreatedThisMonth',
-                [now()->startOfDay(), now()->startOfMonth()]
-            )->first();
+            [now()->startOfDay(), now()->startOfMonth()]
+        )->first();
 
         $data['totalDestination'] = $query->totalDestination != 0 ?: 1;
         $data['totalActiveDestination'] = $query->totalActiveDestination;
@@ -217,7 +218,6 @@ class DestinationController extends Controller
             $api = GoogleMapApi::where('status', 1)->firstOr(function () {
                 throw new \Exception('Map not found.');
             });
-
             $country = Country::where('id', $request->country)->firstOr(function () {
                 throw new \Exception('Country not found.');
             });
@@ -254,8 +254,10 @@ class DestinationController extends Controller
             $destination->save();
 
             return back()->with('success', 'Destination added successfully.');
-        } catch (\Exception $e) {
+        } catch (InvalidLocation $e) {
             return back()->with('error', $e->getMessage());
+        } catch (\Exception $e) {
+            return back()->with('error', __('Something went wrong. Please try again.'));
         }
     }
 
