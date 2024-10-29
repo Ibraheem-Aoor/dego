@@ -13,15 +13,15 @@ return new class extends Migration
     {
         // tables that might a company have
         Schema::table('destinations', function (Blueprint $table) {
-            $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('company_id')->before('created_at')->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->nullOnDelete();
         });
         Schema::table('packages', function (Blueprint $table) {
-            $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('company_id')->before('created_at')->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->cascadeOnDelete();
         });
         Schema::table('bookings', function (Blueprint $table) {
-            $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('company_id')->before('created_at')->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->cascadeOnDelete();
         });
     }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -67,11 +68,9 @@ class Booking extends Model implements DepositableInterface
         });
         // if the auth user is a company get only bookings for that company.
         static::addGlobalScope('belongsToCompany', function (Builder $builder) {
-            $auth_company = getAuthUser('company');
+            $auth_company = getAuthUser(guard: 'company');
             $builder->when(isset($auth_company), function ($query) use ($auth_company) {
-                $query->whereHas('package.company', function ($company) use ($auth_company) {
-                    $company->where('id', $auth_company->id);
-                });
+                $query->where('company_id', $auth_company->id);
             });
         });
     }
@@ -133,5 +132,10 @@ class Booking extends Model implements DepositableInterface
     public function getBookedItemTitle()
     {
         return $this->package_title;
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 }

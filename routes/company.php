@@ -28,7 +28,19 @@ Route::middleware('auth:company')->group(function () {
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('save-token', [DashboardController::class, 'saveToken'])->name('save.token');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('save-token', [DashboardController::class, 'saveToken'])->name('save.token');
+    // Dashboard Statistics
+    Route::get('dashboard/monthly-deposit-withdraw', [DashboardController::class, 'monthlyDepositWithdraw'])->name('monthly.deposit.withdraw');
+    Route::get('dashboard/chartUserRecords', [DashboardController::class, 'chartUserRecords'])->name('chartUserRecords');
+    Route::get('dashboard/chartTicketRecords', [DashboardController::class, 'chartTicketRecords'])->name('chartTicketRecords');
+    Route::get('dashboard/chartKycRecords', [DashboardController::class, 'chartKycRecords'])->name('chartKycRecords');
+    Route::get('dashboard/chartTransactionRecords', [DashboardController::class, 'chartTransactionRecords'])->name('chartTransactionRecords');
+    Route::get('dashboard/chartLoginHistory', [DashboardController::class, 'chartLoginHistory'])->name(name: 'chartLoginHistory');
+    Route::get('dashboard/booking-hsitory', [DashboardController::class, 'totalBooking'])->name('booking.History');
 
+
+    // Destination Moudle
 
     Route::get('all-destination', [DestinationController::class, 'list'])->name('all.destination');
     Route::get('destination/add', [DestinationController::class, 'add'])->name('destination.add');
