@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\Notify;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
@@ -187,5 +188,10 @@ class User extends Authenticatable
     public function notifySetting()
     {
         return $this->morphOne(NotificationSettings::class, 'notifyable');
+    }
+
+    public function rideBookings() : HasMany
+    {
+        return $this->hasMany(DriverRideBooking::class  , 'user_id');
     }
 }

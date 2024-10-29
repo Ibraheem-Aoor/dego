@@ -4,8 +4,8 @@ use App\Http\Controllers\Admin\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\ResetPasswordController;
 use App\Http\Controllers\Agent\CompanyController;
-use App\Http\Controllers\Agent\DashboardController;
 use App\Http\Controllers\Driver\CarController;
+use App\Http\Controllers\Driver\DashboardController;
 use App\Http\Controllers\Driver\PriceController;
 use App\Http\Controllers\Driver\RideBookingController;
 use App\Http\Controllers\Driver\RideController;
@@ -22,9 +22,17 @@ Route::get('password/reset/{token}', [ResetPasswordController::class, 'showReset
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])
     ->name('password.reset.update');
 
-Route::post('logout', [LoginController::class, 'logout'])->name('logout');
-Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-Route::post('save-token', [DashboardController::class, 'saveToken'])->name('save.token');
+    Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('save-token', [DashboardController::class, 'saveToken'])->name('save.token');
+
+    Route::get('dashboard/monthly-deposit-withdraw', [DashboardController::class, 'monthlyDepositWithdraw'])->name('monthly.deposit.withdraw');
+    Route::get('dashboard/chartUserRecords', [DashboardController::class, 'chartUserRecords'])->name('chartUserRecords');
+    Route::get('dashboard/chartTicketRecords', [DashboardController::class, 'chartTicketRecords'])->name('chartTicketRecords');
+    Route::get('dashboard/chartKycRecords', [DashboardController::class, 'chartKycRecords'])->name('chartKycRecords');
+    Route::get('dashboard/chartTransactionRecords', [DashboardController::class, 'chartTransactionRecords'])->name('chartTransactionRecords');
+    Route::get('dashboard/chartLoginHistory', [DashboardController::class, 'chartLoginHistory'])->name('chartLoginHistory');
+    Route::get('dashboard/ride-booking', [DashboardController::class, 'totalBooking'])->name('booking.History');
 
 // Manage Price
 Route::prefix('price')->as('price.')->group(function () {
@@ -65,6 +73,7 @@ Route::prefix('ride')->as('ride.')->group(function () {
         Route::post('completed/{id}', [RideBookingController::class, 'complete'])->name('action');
         Route::any('booking/refund-multiple', [RideBookingController::class, 'refundMultiple'])->name('refund.multiple');
         Route::any('booking/completed-multiple', [RideBookingController::class, 'completedMultiple'])->name('completed.multiple');
+
 
 
     });
