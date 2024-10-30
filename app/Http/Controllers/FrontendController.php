@@ -111,6 +111,7 @@ class FrontendController extends Controller
             $errorMessage = $exception->getMessage();
             die("Database connection failed: " . $errorMessage);
         } catch (\Exception $exception) {
+            dd($exception);
             return redirect()->route('instructionPage')->with('error', $exception->getMessage());
         }
     }
