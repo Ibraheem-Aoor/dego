@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\CarBooking;
+use App\Models\Company;
 use App\Models\Coupon;
 use App\Models\Deposit;
 use App\Models\DestinationVisitor;
@@ -27,52 +29,45 @@ class DashboardController extends Controller
 
     public function index()
     {
+        $auth_agent = getAuthUser('agent');
         $data['firebaseNotify'] = config('firebase');
         $data['latestUser'] = User::latest()->limit(5)->get();
         $statistics['schedule'] = $this->dayList();
 
-        $bookingSummary = Booking::selectRaw('COUNT(*) as booking_count, SUM(total_price) as total_amount')
+        $bookingSummary = Booking::whereHas('company', function ($query) use ($auth_agent) {
+            $query->where('id', $auth_agent->company_id);
+        })->selectRaw('COUNT(*) as booking_count, SUM(total_price) as total_amount')
             ->first();
         $data['booking'] = $bookingSummary->booking_count;
         $data['totalAmount'] = $bookingSummary->total_amount;
+        $carBookingSummary = CarBooking::query()->whereHas('company', function ($query) use ($auth_agent) {
+            $query->whereBelongsTo($auth_agent);
+        })->selectRaw('COUNT(*) as booking_count, SUM(total_price) as total_amount')
+            ->first();
+        $data['car_booking'] = $carBookingSummary->booking_count;
+        $data['car_booking_totalAmount'] = $carBookingSummary->total_amount;
 
-        $visitor = PackageVisitor::selectRaw('
-                COUNT(*) as totalVisitor,
-                SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as VisitorToday,
-                COUNT(DISTINCT CASE WHEN DATE(created_at) = CURDATE() THEN ip_address END) as uniqueVisitor,
-                SUM(CASE WHEN DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 1 ELSE 0 END) as visitorsYesterday
-            ')->first();
-
-        $data['totalVisitor'] = $visitor->totalVisitor;
-        $data['VisitorToday'] = $visitor->VisitorToday;
-        $data['uniqueVisitor'] = $visitor->uniqueVisitor;
-        $visitorsYesterday = $visitor->visitorsYesterday;
-        $data['growthVisitor'] = ($visitorsYesterday > 0) ? (($data['VisitorToday'] - $visitorsYesterday) / $visitorsYesterday * 100) : 0;
-
-        $destinationVisitor= DestinationVisitor::selectRaw('
-                        COUNT(*) as totalVisitor,
-                        SUM(CASE WHEN DATE(created_at) = CURDATE() THEN 1 ELSE 0 END) as VisitorToday,
-                        COUNT(DISTINCT CASE WHEN DATE(created_at) = CURDATE() THEN ip_address END) as uniqueVisitor,
-                        SUM(CASE WHEN DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY) THEN 1 ELSE 0 END) as visitorsYesterday
-                    ')->first();
-
-
-        $data['totalDestinationVisitor'] = $destinationVisitor->totalVisitor;
-        $data['destinationVisitorToday'] = $destinationVisitor->VisitorToday;
-        $data['uniqueDestinationVisitor'] = $destinationVisitor->uniqueVisitor;
-        $visitorsYesterday = $destinationVisitor->visitorsYesterday;
-        $data['growthDestinationVisitor'] = ($visitorsYesterday > 0) ? (($data['totalDestinationVisitor'] - $visitorsYesterday) / $visitorsYesterday * 100) : 0;
-
-        return view('admin.dashboard-alternative', $data, compact("statistics"));
+        return view('agent.dashboard-alternative', $data, compact("statistics"));
     }
     public function monthlyDepositWithdraw(Request $request)
     {
         $keyDataset = $request->keyDataset;
         $dailyDeposit = $this->dayList();
-
-        Deposit::when($keyDataset == '0', function ($query) {
-            $query->whereMonth('created_at', Carbon::now()->month);
-        })
+        $auth_agent = getAuthUser('agent');
+        Deposit::query()->where('depositable_type', CarBooking::class)
+            ->whereHasMorph('depositable', CarBooking::class, function ($query) use ($auth_agent) {
+                $query->whereHas('company' , function($company) use($auth_agent){
+                    $company->whereBelongsTo($auth_agent);
+                });
+            })->when($keyDataset == '0', function ($query) {
+                $query->whereMonth('created_at', Carbon::now()->month);
+            })
+            ->orWhere('depositable_type', Booking::class)
+            ->whereHasMorph('depositable', Booking::class, function ($query) use ($auth_agent) {
+                $query->whereHas('company' , function($company) use($auth_agent){
+                    $company->whereBelongsTo($auth_agent);
+                });
+            })
             ->when($keyDataset == '1', function ($query) {
                 $lastMonth = Carbon::now()->subMonth();
                 $query->whereMonth('created_at', $lastMonth->month);
@@ -85,7 +80,6 @@ class DashboardController extends Controller
             ->get()->map(function ($item) use ($dailyDeposit) {
                 $dailyDeposit->put($item['date'], $item['totalDeposit']);
             });
-
         return response()->json([
             "totalDeposit" => currencyPosition($dailyDeposit->sum()),
             "dailyDeposit" => $dailyDeposit,
@@ -94,7 +88,7 @@ class DashboardController extends Controller
 
     public function saveToken(Request $request)
     {
-        $admin = Auth::guard('admin')->user()
+        $admin = Auth::guard('company')->user()
             ->fireBaseToken()
             ->create([
                 'token' => $request->token,
@@ -129,7 +123,7 @@ class DashboardController extends Controller
         } elseif ($percentageIncrease < 0) {
             $class = "bg-soft-danger text-danger";
         } else {
-            $class =  "bg-soft-secondary text-body";
+            $class = "bg-soft-secondary text-body";
         }
 
         return [
@@ -167,67 +161,24 @@ class DashboardController extends Controller
         return response()->json(['userRecord' => $userRecord, 'current_month_data_dates' => $current_month_data_dates, 'current_month_datas' => $current_month_datas]);
     }
 
-    public function chartTicketRecords()
-    {
-        $currentMonth = Carbon::now()->format('Y-m');
-        $ticketRecord = collect(SupportTicket::selectRaw('COUNT(id) AS totalTickets')
-            ->selectRaw('COUNT(CASE WHEN DATE(created_at) = CURDATE() THEN id END) AS currentDateTicketsCount')
-            ->selectRaw('COUNT(CASE WHEN DATE(created_at) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) THEN id END) AS previousDateTicketsCount')
-            ->selectRaw('count(CASE WHEN status = 2  THEN status END) AS replied')
-            ->selectRaw('count(CASE WHEN status = 1  THEN status END) AS answered')
-            ->selectRaw('count(CASE WHEN status = 0  THEN status END) AS pending')
-            ->get()
-            ->toArray())->collapse();
 
-        $followupGrap = $this->followupGrap($ticketRecord['currentDateTicketsCount'], $ticketRecord['previousDateTicketsCount']);
-        $ticketRecord->put('followupGrapClass', $followupGrap['class']);
-        $ticketRecord->put('followupGrap', $followupGrap['percentage']);
-
-        $current_month_data = DB::table('support_tickets')
-            ->select(DB::raw('DATE_FORMAT(created_at,"%e %b") as date'), DB::raw('count(*) as count'))
-            ->where(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'), $currentMonth)
-            ->orderBy('created_at', 'asc')
-            ->groupBy('date')
-            ->get();
-
-        $current_month_data_dates = $current_month_data->pluck('date');
-        $current_month_datas = $current_month_data->pluck('count');
-        $ticketRecord['chartPercentageIncDec'] = fractionNumber($ticketRecord['totalTickets'] - $ticketRecord['currentDateTicketsCount'], false);
-        return response()->json(['ticketRecord' => $ticketRecord, 'current_month_data_dates' => $current_month_data_dates, 'current_month_datas' => $current_month_datas]);
-    }
-
-    public function chartKycRecords()
-    {
-        $currentMonth = Carbon::now()->format('Y-m');
-        $kycRecords = collect(UserKyc::selectRaw('COUNT(id) AS totalKYC')
-            ->selectRaw('COUNT(CASE WHEN DATE(created_at) = CURDATE() THEN id END) AS currentDateKYCCount')
-            ->selectRaw('COUNT(CASE WHEN DATE(created_at) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) THEN id END) AS previousDateKYCCount')
-            ->selectRaw('count(CASE WHEN status = 0  THEN status END) AS pendingKYC')
-            ->get()
-            ->toArray())->collapse();
-        $followupGrap = $this->followupGrap($kycRecords['currentDateKYCCount'], $kycRecords['previousDateKYCCount']);
-        $kycRecords->put('followupGrapClass', $followupGrap['class']);
-        $kycRecords->put('followupGrap', $followupGrap['percentage']);
-
-
-        $current_month_data = DB::table('user_kycs')
-            ->select(DB::raw('DATE_FORMAT(created_at,"%e %b") as date'), DB::raw('count(*) as count'))
-            ->where(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'), $currentMonth)
-            ->orderBy('created_at', 'asc')
-            ->groupBy('date')
-            ->get();
-
-        $current_month_data_dates = $current_month_data->pluck('date');
-        $current_month_datas = $current_month_data->pluck('count');
-        $kycRecords['chartPercentageIncDec'] = fractionNumber($kycRecords['totalKYC'] - $kycRecords['currentDateKYCCount'], false);
-        return response()->json(['kycRecord' => $kycRecords, 'current_month_data_dates' => $current_month_data_dates, 'current_month_datas' => $current_month_datas]);
-    }
 
     public function chartTransactionRecords()
     {
         $currentMonth = Carbon::now()->format('Y-m');
+        $auth_agent = getAuthUser('agent');
 
-        $transaction = collect(Transaction::selectRaw('COUNT(id) AS totalTransaction')
+        $transaction = collect(Transaction::query()->whereHasMorph('transactional', Deposit::class, function ($deposit) use ($auth_agent) {
+            $deposit->whereHasMorph('depositable', Booking::class, function ($ride) use ($auth_agent) {
+                $ride->whereHas('company' , function($company) use($auth_agent){
+                    $company->whereBelongsTo($auth_agent);
+                });
+            })->orWhereHasMorph('depositable', CarBooking::class, function ($ride) use ($auth_agent) {
+                $ride->whereHas('company' , function($company) use($auth_agent){
+                    $company->whereBelongsTo($auth_agent);
+                });
+            });
+        })->selectRaw('COUNT(id) AS totalTransaction')
             ->selectRaw('COUNT(CASE WHEN DATE(created_at) = CURDATE() THEN id END) AS currentDateTransactionCount')
             ->selectRaw('COUNT(CASE WHEN DATE(created_at) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) THEN id END) AS previousDateTransactionCount')
             ->whereRaw('YEAR(created_at) = YEAR(NOW()) AND MONTH(created_at) = MONTH(NOW())')
@@ -240,7 +191,30 @@ class DashboardController extends Controller
         $transaction->put('followupGrap', $followupGrap['percentage']);
 
 
-        $current_month_data = DB::table('transactions')
+        $current_month_data = Transaction::query()
+            ->whereHasMorph(
+                'transactional',
+                Deposit::class,
+                function ($deposit) use ($auth_agent) {
+                    $deposit->whereHasMorph(
+                        'depositable',
+                        Booking::class,
+                        function ($booking) use ($auth_agent) {
+                            $booking->whereHas('company' , function($company) use($auth_agent){
+                                $company->whereBelongsTo($auth_agent);
+                            });
+                        }
+                    )->orWhereHasMorph(
+                            'depositable',
+                            Booking::class,
+                            function ($booking) use ($auth_agent) {
+                                $booking->whereHas('company' , function($company) use($auth_agent){
+                                    $company->whereBelongsTo($auth_agent);
+                                });
+                            }
+                        );
+                }
+            )
             ->select(DB::raw('DATE_FORMAT(created_at,"%e %b") as date'), DB::raw('count(*) as count'))
             ->where(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'), $currentMonth)
             ->orderBy('created_at', 'asc')
@@ -253,27 +227,86 @@ class DashboardController extends Controller
         return response()->json(['transactionRecord' => $transaction, 'current_month_data_dates' => $current_month_data_dates, 'current_month_datas' => $current_month_datas]);
     }
 
-
-    public function chartLoginHistory()
+    public function chartCompanyRecored()
     {
-        $userLoginsData = DB::table('user_logins')
-            ->whereDate('created_at', '>=', now()->subDays(30))
-            ->select('browser', 'os', 'get_device')
+        $currentMonth = Carbon::now()->format('Y-m');
+        $auth_agent = getAuthUser('agent');
+
+        $company = collect(Company::query()->whereBelongsTo($auth_agent)
+        ->selectRaw('COUNT(id) AS totalTransaction')
+            ->selectRaw('COUNT(CASE WHEN DATE(created_at) = CURDATE() THEN id END) AS currentDateTransactionCount')
+            ->selectRaw('COUNT(CASE WHEN DATE(created_at) = DATE(DATE_SUB(NOW(), INTERVAL 1 DAY)) THEN id END) AS previousDateTransactionCount')
+            ->whereRaw('YEAR(created_at) = YEAR(NOW()) AND MONTH(created_at) = MONTH(NOW())')
+            ->get()
+            ->toArray())
+            ->collapse();
+
+        $followupGrap = $this->followupGrap($company['currentDateTransactionCount'], $company['previousDateTransactionCount']);
+        $company->put('followupGrapClass', $followupGrap['class']);
+        $company->put('followupGrap', $followupGrap['percentage']);
+
+
+        $current_month_data = Company::query()
+            ->whereBelongsTo($auth_agent)
+            ->select(DB::raw('DATE_FORMAT(created_at,"%e %b") as date'), DB::raw('count(*) as count'))
+            ->where(DB::raw('DATE_FORMAT(created_at, "%Y-%m")'), $currentMonth)
+            ->orderBy('created_at', 'asc')
+            ->groupBy('date')
             ->get();
 
-        $userLoginsBrowserData = $userLoginsData->groupBy('browser')->map->count();
-        $data['browserKeys'] = $userLoginsBrowserData->keys();
-        $data['browserValue'] = $userLoginsBrowserData->values();
+        $current_month_data_dates = $current_month_data->pluck('date');
+        $current_month_datas = $current_month_data->pluck('count');
+        $company['chartPercentageIncDec'] = fractionNumber($company['totalTransaction'] - $company['currentDateTransactionCount'], false);
+        return response()->json(['companyRecord' => $company, 'current_month_data_dates' => $current_month_data_dates, 'current_month_datas' => $current_month_datas]);
+    }
 
-        $userLoginsOSData = $userLoginsData->groupBy('os')->map->count();
-        $data['osKeys'] = $userLoginsOSData->keys();
-        $data['osValue'] = $userLoginsOSData->values();
 
-        $userLoginsDeviceData = $userLoginsData->groupBy('get_device')->map->count();
-        $data['deviceKeys'] = $userLoginsDeviceData->keys();
-        $data['deviceValue'] = $userLoginsDeviceData->values();
 
-        return response()->json(['loginPerformance' => $data]);
+
+    public function totalBooking(Request $request)
+    {
+
+        $model_name = '\\App\\Models\\' . $request->model;
+        $model = new $model_name();
+        $currentMonth = now()->format('Y-m');
+        $auth_agent = getAuthUser('agent');
+        $propertyBooking = $model::query()->whereHas('company' , function($company)use($auth_agent){
+            $company->whereBelongsTo($auth_agent);
+        })->select(
+            DB::raw('DAY(created_at) as day'),
+            DB::raw('COUNT(*) as total_sales'),
+            DB::raw('SUM(total_price) as total_amount')
+        )
+            ->whereRaw("DATE_FORMAT(created_at, '%Y-%m') = '$currentMonth'")
+            ->groupBy('day')
+            ->orderBy('day', 'asc')
+            ->get();
+
+        $data['labels'] = [];
+        $data['TotalUnit'] = [];
+        $data['totalPrice'] = [];
+
+        $lastDayOfMonth = now()->endOfMonth()->format('d');
+
+        for ($day = 1; $day <= $lastDayOfMonth; $day++) {
+            $found = $propertyBooking->firstWhere('day', $day);
+
+            if ($found) {
+                $data['labels'][] = 'Day ' . $day;
+                $data['TotalUnit'][] = $found->total_sales;
+                $data['totalPrice'][] = $found->total_amount;
+            } else {
+                $data['labels'][] = 'Day ' . $day;
+                $data['TotalUnit'][] = 0;
+                $data['totalPrice'][] = 0;
+            }
+        }
+
+        return response()->json([
+            'labels' => $data['labels'],
+            'Unit' => $data['TotalUnit'],
+            'Price' => $data['totalPrice'],
+        ]);
     }
 
 

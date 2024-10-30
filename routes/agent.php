@@ -21,6 +21,15 @@ Route::post('password/reset', [ResetPasswordController::class, 'reset'])
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::post('save-token', [DashboardController::class, 'saveToken'])->name('save.token');
+Route::get('dashboard/monthly-deposit-withdraw', [DashboardController::class, 'monthlyDepositWithdraw'])->name('monthly.deposit.withdraw');
+Route::get('dashboard/chartUserRecords', [DashboardController::class, 'chartUserRecords'])->name('chartUserRecords');
+Route::get('dashboard/chartTicketRecords', [DashboardController::class, 'chartTicketRecords'])->name('chartTicketRecords');
+Route::get('dashboard/chartKycRecords', [DashboardController::class, 'chartKycRecords'])->name('chartKycRecords');
+Route::get('dashboard/chartTransactionRecords', [DashboardController::class, 'chartTransactionRecords'])->name('chartTransactionRecords');
+Route::get('dashboard/chartcompanyRecored', [DashboardController::class, 'chartCompanyRecored'])->name('chartCompanyRecords');
+Route::get('dashboard/chartLoginHistory', [DashboardController::class, 'chartLoginHistory'])->name('chartLoginHistory');
+Route::get('dashboard/ride-booking', [DashboardController::class, 'totalBooking'])->name('booking.History');
+
 
 
 Route::prefix('companies')->as('company.')->group(function () {

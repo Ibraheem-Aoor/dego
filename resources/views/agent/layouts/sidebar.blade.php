@@ -5,7 +5,7 @@
     <div class="navbar-vertical-container">
         <div class="navbar-vertical-footer-offset">
             <!-- Logo -->
-            <a class="navbar-brand" href="{{ route('admin.dashboard') }}" aria-label="{{ $basicControl->site_title }}">
+            <a class="navbar-brand" href="{{ route('driver.dashboard') }}" aria-label="{{ $basicControl->site_title }}">
                 <img class="navbar-brand-logo navbar-brand-logo-auto"
                     src="{{ getFile(in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->admin_dark_mode_logo_driver : $basicControl->admin_logo_driver, in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->admin_dark_mode_logo : $basicControl->admin_logo, true) }}"
                     alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="default">
@@ -41,7 +41,7 @@
                 <div id="navbarVerticalMenu" class="nav nav-pills nav-vertical card-navbar-nav">
                     <div class="nav-item">
                         <a class="nav-link {{ menuActive(['admin.dashboard']) }}"
-                            href="{{ route('admin.dashboard') }}">
+                            href="{{ route('driver.dashboard') }}">
                             <i class="bi-house-door nav-icon"></i>
                             <span class="nav-link-title">@lang('Dashboard')</span>
                         </a>

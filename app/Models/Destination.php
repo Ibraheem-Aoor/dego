@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Scopes\BelongsToCompanyScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Destination extends Model
 {
@@ -61,6 +62,11 @@ class Destination extends Model
     public function visitor()
     {
         return $this->hasMany(DestinationVisitor::class, 'destination_id');
+    }
+
+    public function company() : BelongsTo
+    {
+        return $this->belongsTo(Company::class  , 'company_id');
     }
 
 }
