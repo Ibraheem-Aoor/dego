@@ -10,4 +10,4 @@
 /storage/logs
 /assets/upload
 project.zip
-/storage/*.json
+/storage/**/*.json
