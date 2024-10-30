@@ -109,6 +109,12 @@
                             <i class="bi bi-boxes nav-icon"></i>
                             <span class="nav-link-title">@lang('Manage Cars')</span>
                         </a>
+                        <div id="navbarVerticalCarMenu"
+                            class="nav-collapse collapse {{ menuActive(['company.all.booking', 'admin.all.booking.search', 'admin.booking.edit'], 2) }}"
+                            data-bs-parent="#navbarVerticalCarMenu">
+                            <a class="nav-link {{ request()->is('company/car/list') ? 'active' : '' }}"
+                                href="{{ route('company.car.list', ['status' => 'all']) }}">@lang('Cars')</a>
+                        </div>
                     </div>
                     {{-- Manage Car Bookings --}}
                     {{-- Manage Bookings --}}

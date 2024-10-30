@@ -4,24 +4,24 @@
     {{ in_array(session()->get('themeMode'), [null, 'auto']) ? 'navbar-dark bg-dark ' : 'navbar-light bg-white' }}">
     <div class="navbar-vertical-container">
         <div class="navbar-vertical-footer-offset">
-            <!-- Logo -->
-            <a class="navbar-brand" href="{{ route('driver.dashboard') }}" aria-label="{{ $basicControl->site_title }}">
-                <img class="navbar-brand-logo navbar-brand-logo-auto"
-                    src="{{ getFile(in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->driver_dark_mode_logo_driver : $basicControl->driver_logo_driver, in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->driver_dark_mode_logo : $basicControl->driver_logo, true) }}"
-                    alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="default">
+           <!-- Logo -->
+           <a class="navbar-brand" href="{{ route('company.dashboard') }}" aria-label="{{ $basicControl->site_title }}">
+            <img class="navbar-brand-logo navbar-brand-logo-auto"
+                src="{{ getFile(in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->admin_dark_mode_logo_driver : $basicControl->admin_logo_driver, in_array(session()->get('themeMode'), ['auto', null]) ? $basicControl->admin_dark_mode_logo : $basicControl->admin_logo, true) }}"
+                alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="default">
 
-                <img class="navbar-brand-logo"
-                    src="{{ getFile($basicControl->driver_dark_mode_logo_driver, $basicControl->driver_dark_mode_logo, true) }}"
-                    alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="dark">
+            <img class="navbar-brand-logo"
+                src="{{ getFile($basicControl->admin_dark_mode_logo_driver, $basicControl->admin_dark_mode_logo, true) }}"
+                alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="dark">
 
-                <img class="navbar-brand-logo-mini"
-                    src="{{ getFile($basicControl->favicon_driver, $basicControl->favicon, true) }}"
-                    alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="default">
-                <img class="navbar-brand-logo-mini"
-                    src="{{ getFile($basicControl->favicon_driver, $basicControl->favicon, true) }}" alt="Logo"
-                    data-hs-theme-appearance="dark">
-            </a>
-            <!-- End Logo -->
+            <img class="navbar-brand-logo-mini"
+                src="{{ getFile($basicControl->favicon_driver, $basicControl->favicon, true) }}"
+                alt="{{ $basicControl->site_title }} Logo" data-hs-theme-appearance="default">
+            <img class="navbar-brand-logo-mini"
+                src="{{ getFile($basicControl->favicon_driver, $basicControl->favicon, true) }}" alt="Logo"
+                data-hs-theme-appearance="dark">
+        </a>
+        <!-- End Logo -->
 
             <!-- Navbar Vertical Toggle -->
             <button type="button" class="js-navbar-vertical-aside-toggle-invoker navbar-aside-toggler">

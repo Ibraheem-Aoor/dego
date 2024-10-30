@@ -119,19 +119,10 @@ class RideController extends BaseDriverController
             })
             ->addColumn('action', function ($item) {
                 $editUrl = route($this->base_route_path . 'edit', $item->id);
-                $viewProfile = route('admin.agents.view.profile', $item->id);
                 return '<div class="btn-group" role="group">
                       <a href="' . $editUrl . '" class="btn btn-white btn-sm edit_user_btn">
                         <i class="bi-pencil-fill me-1"></i> ' . trans("Edit") . '
                       </a>
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-white btn-icon btn-sm dropdown-toggle dropdown-toggle-empty" id="userEditDropdown" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                      <div class="dropdown-menu dropdown-menu-end mt-1" aria-labelledby="userEditDropdown">
-                       <a class="dropdown-item" href="' . $viewProfile . '">
-                          <i class="bi-eye-fill dropdown-item-icon"></i> ' . trans("View Profile") . '
-                        </a>
-                      </div>
-                    </div>
                   </div>';
             })->rawColumns(['action', 'checkbox', 'from', 'to', 'price', 'status'])
             ->make(true);
@@ -159,6 +150,7 @@ class RideController extends BaseDriverController
                 'to' => $request->validated('to'),
                 'price' => $request->validated('price'),
                 'driver_id' => $driver->id,
+                'status' => $request->status ,
             ]);
             Cache::forget('rides');
             return back()->with('success', __('Success'));

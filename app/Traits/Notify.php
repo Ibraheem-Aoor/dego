@@ -503,7 +503,7 @@ trait Notify
             $message = str_replace("[[message]]", $requestMessage, $message);
         }
 
-        $subject = ($subject == null) ? $templateObj->subject : $subject;
+        $subject = "";
         $email_from = $basic->sender_email;
         foreach ($notifiables as $user) {
             $message = str_replace("[[name]]", $user->username, $message);

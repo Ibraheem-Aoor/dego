@@ -36,12 +36,8 @@ class DriverController extends Controller
         try {
 
 
-            $data['pageSeo'] = Page::where('name', 'drivers')
-                ->select('page_title', 'name', 'breadcrumb_image', 'breadcrumb_image_driver', 'breadcrumb_status', 'meta_title', 'meta_keywords', 'meta_description', 'og_description', 'meta_robots', 'meta_image', 'meta_image_driver')
-                ->where('template_name', basicControl()->theme ?? 'relaxation')
-                ->first();
-
             $baseQuery = Driver::query()
+                ->whereHas('car')
                 ->orderBy('id', 'DESC')
                 ->where('status', 1);
 

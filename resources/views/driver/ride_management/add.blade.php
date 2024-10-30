@@ -39,7 +39,8 @@
                                                 class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip"
                                                 data-bs-placement="top" title="Type your package name here..."></i></label>
                                         <input type="text" class="form-control" name="from" id="nameLabel"
-                                            placeholder="@lang('e.g. BMW X5 2019')" aria-label="name" value="{{ old('from' , $ride?->from) }}">
+                                            placeholder="@lang('e.g. Cairo')" aria-label="name"
+                                            value="{{ old('from', $ride?->from) }}">
 
                                         @error('from')
                                             <span class="invalid-feedback d-block" role="alert">
@@ -54,7 +55,8 @@
                                                 class="bi-question-circle text-body ms-1" data-bs-toggle="tooltip"
                                                 data-bs-placement="top" title="Type your package name here..."></i></label>
                                         <input type="text" class="form-control" name="to" id="nameLabel"
-                                            placeholder="@lang('e.g. BMW X5 2019')" aria-label="name" value="{{ old('to' , $ride?->to) }}">
+                                            placeholder="@lang('e.g. Cairo')" aria-label="name"
+                                            value="{{ old('to', $ride?->to) }}">
 
                                         @error('to')
                                             <span class="invalid-feedback d-block" role="alert">
@@ -69,7 +71,7 @@
                                             class="col-sm-3 col-form-label form-label">@lang('Price')</label>
                                         <div class="input-group">
                                             <input type="number" class="form-control wid1" name="price" id="price"
-                                                value="{{ old('price' , $ride?->price) }}" placeholder="e.g 50"
+                                                value="{{ old('price', $ride?->price) }}" placeholder="e.g 50"
                                                 aria-label="price">
                                             <h5 class="form-control wid2 mb-0">{{ basicControl()->base_currency }}</h5>
                                         </div>
@@ -81,6 +83,23 @@
                                         @enderror
                                     </div>
                                 </div>
+                                <div class="col-lg-12 col-md-12">
+                                    <label class="row form-check form-switch mb-4" for="userStatusSwitch">
+                                        <span class="col-8 col-sm-3 ms-0">
+                                            <span class="d-block text-dark">@lang('Status')</span>
+                                        </span>
+                                        <span class="col-4 col-sm-3">
+                                            <input type="hidden" name="status" value="0">
+                                            <input type="checkbox" class="form-check-input" name="status"
+                                                id="userStatusSwitch" value="1"
+                                                {{ $ride?->status == 1 ? 'checked' : '' }}>
+                                        </span>
+                                    </label>
+                                    @error('status')
+                                        <span class="invalid-feedback d-block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
 
                             </div>
                         </div>
