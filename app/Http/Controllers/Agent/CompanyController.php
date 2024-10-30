@@ -34,13 +34,17 @@ class CompanyController extends Controller
 {
     use Upload, Notify;
 
+    private function cacheKey()
+    {
+        return 'company_recored_' . getAuthUser('agent')->id;
+    }
     public function index()
     {
         $data['basic'] = basicControl();
-
-        $company_recored = \Cache::get('company_recored');
+        $auth_agent = getAuthUser('agent');
+        $company_recored = \Cache::get($this->cacheKey());
         if (!$company_recored) {
-            $company_recored = Company::query()->whereBelongsTo(getAuthUser('agent'))->withTrashed()->selectRaw('COUNT(id) AS totalUserWithTrashed')
+            $company_recored = Company::query()->whereBelongsTo($auth_agent)->withTrashed()->selectRaw('COUNT(id) AS totalUserWithTrashed')
                 ->selectRaw('COUNT(CASE WHEN deleted_at IS NULL THEN id END) AS totalUser')
                 ->selectRaw('(COUNT(CASE WHEN deleted_at IS NULL THEN id END) / COUNT(id)) * 100 AS totalUserPercentage')
                 ->selectRaw('COUNT(CASE WHEN status = 1 THEN id END) AS activeUser')
@@ -51,7 +55,7 @@ class CompanyController extends Controller
                 ->selectRaw('(COUNT(CASE WHEN status = 0 THEN id END) / COUNT(id)) * 100 AS deactivateUserPercentage')
                 ->get()
                 ->toArray();
-            \Cache::put('company_recored', $company_recored);
+            \Cache::put($this->cacheKey(), $company_recored);
         }
         return view('agent.company_management.list', $data, compact('company_recored'));
 
@@ -92,7 +96,7 @@ class CompanyController extends Controller
             })
             ->when(isset($filterTwoFaSecurity) && !empty($filterTwoFaSecurity), function ($query) use ($filterTwoFaSecurity) {
                 return $query->where('two_fa_verify', $filterTwoFaSecurity);
-            });
+            })->whereBelongsTo(getAuthUser('agent'));
 
         return DataTables::of($users)
             ->addColumn('checkbox', function ($item) {
@@ -137,7 +141,7 @@ class CompanyController extends Controller
             })
             ->addColumn('action', function ($item) {
                 $editUrl = route('agent.company.edit', $item->id);
-                $viewProfile = route('admin.agents.view.profile', $item->id);
+                $viewProfile = route('agent.company.view.profile', $item->id);
                 return '<div class="btn-group" role="group">
                       <a href="' . $editUrl . '" class="btn btn-white btn-sm edit_user_btn">
                         <i class="bi-pencil-fill me-1"></i> ' . trans("Edit") . '
@@ -538,7 +542,7 @@ class CompanyController extends Controller
             if (!$response) {
                 throw new Exception('Something went wrong, Please try again.');
             }
-            Cache::forget('company_recored');
+            Cache::forget($this->cacheKey());
             return $this->userCreateSuccessMessage($response->id);
 
         } catch (\Exception $exp) {

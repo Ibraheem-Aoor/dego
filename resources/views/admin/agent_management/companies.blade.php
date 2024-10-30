@@ -46,6 +46,7 @@
                                         <tr>
                                             <th>@lang('No.')</th>
                                             <th>@lang('Company')</th>
+                                            <th>@lang('country')</th>
                                             <th>@lang('Packages')</th>
                                             <th>@lang('Date-time')</th>
                                         </tr>
@@ -136,6 +137,10 @@
                     {
                         data: 'name',
                         name: 'name'
+                    },
+                    {
+                        data: 'country',
+                        name: 'country'
                     },
                     {
                         data: 'packages',

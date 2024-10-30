@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\Booking;
+use App\Models\CarBooking;
 use App\Models\Coupon;
 use App\Models\Deposit;
+use App\Models\DriverRideBooking;
 use App\Models\Gateway;
 use App\Models\InstantSave;
 use App\Models\Package;
@@ -181,6 +184,8 @@ class CheckoutController extends Controller
         $instant->postal_code = $request->postalCode;
         $instant->message = $request->message;
         $instant->date = $request->date;
+        $instant->company_id = $package->company_id;
+
         $instant->save();
 
         return response()->json([

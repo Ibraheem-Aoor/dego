@@ -313,8 +313,8 @@ trait Notify
                         "icon" => getFile(config('filesystems.default'), basicControl()->favicon),
                     ],
                     "data" => [
-                        "foreground" => (int)$notify['user_foreground'],
-                        "background" => (int)$notify['user_background'],
+                        "foreground" => (int) $notify['user_foreground'],
+                        "background" => (int) $notify['user_background'],
                         "click_action" => $action
                     ],
                     "content_available" => true,
@@ -378,7 +378,7 @@ trait Notify
 
     }
 
-    public function adminFirebasePushNotification($templateKey, $params = [], $action = null)
+    public function adminFirebasePushNotification($templateKey, $params = [], $action = null, $notiables = [])
     {
         try {
             $basic = basicControl();
@@ -407,37 +407,39 @@ trait Notify
                     $template = str_replace('[[' . $code . ']]', $value, $template);
                 }
             }
-            $admins = FireBaseToken::where('tokenable_type', Admin::class)->get();
+            $data = [];
+            foreach ($notiables as $notiable) {
+                $notiable = FireBaseToken::where('tokenable_type', $notiable->type)->where('tokenable_id', $notiable->id)->first();
+                foreach ($notiables as $admin) {
+                    $data[] = [
+                        "to" => $admin->token,
+                        "notification" => [
+                                "title" => $templateObj->name,
+                                "body" => $template,
+                                "icon" => getFile(config('filesystems.default'), basicControl()->favicon),
+                                "data" => [
+                                        "foreground" => (int) $notify['admin_foreground'],
+                                        "background" => (int) $notify['admin_background'],
+                                        "click_action" => $action['link']
+                                    ],
+                                "content_available" => true,
+                                "mutable_content" => true
+                            ]
+                    ];
 
-            foreach ($admins as $admin) {
-                $data = [
-                    "to" => $admin->token,
-                    "notification" => [
-                        "title" => $templateObj->name,
-                        "body" => $template,
-                        "icon" => getFile(config('filesystems.default'), basicControl()->favicon),
-                        "data" => [
-                            "foreground" => (int)$notify['admin_foreground'],
-                            "background" => (int)$notify['admin_background'],
-                            "click_action" => $action['link']
-                        ],
-                        "content_available" => true,
-                        "mutable_content" => true
-                    ]
-                ];
-
-                $response = Http::withHeaders([
-                    'Authorization' => 'key=' . $notify['serverKey']
-                ])
-                    ->acceptJson()
-                    ->post('https://fcm.googleapis.com/fcm/send', $data);
+                    $response = Http::withHeaders([
+                        'Authorization' => 'key=' . $notify['serverKey']
+                    ])
+                        ->acceptJson()
+                        ->post('https://fcm.googleapis.com/fcm/send', $data);
+                }
             }
         } catch (\Exception $e) {
             return 0;
         }
     }
 
-    public function adminPushNotification($templateKey, $params = [], $action = [])
+    public function adminPushNotification($templateKey, $params = [], $action = [], $notiables = [])
     {
 
         try {
@@ -459,19 +461,18 @@ trait Notify
                 $action['text'] = $template;
             }
 
-            $admins = Admin::all();
-            foreach ($admins as $admin) {
+            foreach ($notiables as $notiable) {
                 $inAppNotification = new InAppNotification();
                 $inAppNotification->description = $action;
-                $admin->inAppNotification()->save($inAppNotification);
-                event(new AdminNotification($inAppNotification, $admin->id));
+                $notiable->inAppNotification()->save($inAppNotification);
+                event(new AdminNotification($inAppNotification, $notiable->id));
             }
         } catch (\Exception $e) {
             return 0;
         }
     }
 
-    public function adminMail($templateKey = null, $params = [], $subject = null, $requestMessage = null)
+    public function adminMail($templateKey = null, $params = [], $subject = null, $requestMessage = null, $notifiables = [])
     {
         $basic = basicControl();
 
@@ -504,10 +505,9 @@ trait Notify
 
         $subject = ($subject == null) ? $templateObj->subject : $subject;
         $email_from = $basic->sender_email;
-        $admins = Admin::all()->toArray();
-        foreach ($admins as $admin) {
-            $message = str_replace("[[name]]", $admin->username, $message);
-            Mail::to($admin)->queue(new SendMail($email_from, $subject, $message));
+        foreach ($notifiables as $user) {
+            $message = str_replace("[[name]]", $user->username, $message);
+            Mail::to($user)->queue(new SendMail($email_from, $subject, $message));
         }
     }
 }

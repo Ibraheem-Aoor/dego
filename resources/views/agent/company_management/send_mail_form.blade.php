@@ -4,7 +4,7 @@
     <div class="content container-fluid">
         <div class="row justify-content-lg-center">
             <div class="col-lg-10">
-                @include('admin.agent_management.components.header_user_profile')
+                @include('agent.company_management.components.header_user_profile')
                 <div class="row" id="add_kyc_form_table">
                     <div class="col-lg-12">
                         <div class="d-grid gap-3 gap-lg-5">
@@ -48,8 +48,8 @@
     </div>
 
     {{-- @include('admin.user_management.components.login_as_user')
-    @include('admin.user_management.components.update_balance_modal')
-    @include('admin.user_management.components.block_profile_modal') --}}
+    @include('admin.user_management.components.update_balance_modal') --}}
+    @include('agent.company_management.components.block_profile_modal')
 
 @endsection
 

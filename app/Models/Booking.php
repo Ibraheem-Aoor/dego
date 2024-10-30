@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use App\Interface\DepositableInterface;
+use App\Interface\NotifableUsers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 
-class Booking extends Model implements DepositableInterface
+class Booking extends Model implements DepositableInterface , NotifableUsers
 {
     use HasFactory, Prunable;
 
@@ -138,4 +140,21 @@ class Booking extends Model implements DepositableInterface
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
+
+    /**
+     * Return the list of companies that have booking and will be notified.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company>
+     */
+    public static function getNotifableUsers(): Collection
+    {
+        $comapny_ids = self::query()->pluck('company_id');
+        $companies = Company::select(['id', 'name' , 'email'])->whereIn('id', $comapny_ids)->get();
+        $companies = $companies->map(function (Company $company) {
+            $company->notifable_type = Company::class;
+            return $company;
+        });
+        return $companies;
+    }
+
 }

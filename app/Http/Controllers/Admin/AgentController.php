@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
 use App\Models\Agent;
 use App\Models\Company;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 
 class AgentController extends Controller
@@ -179,8 +180,11 @@ class AgentController extends Controller
             return response()->json(['error' => 1]);
         } else {
             Agent::whereIn('id', $request->strIds)->get()->map(function ($user) {
-                $user->forceDelete();
+                if(!$user->companies->isEmpty() && !($user->companies()->whereHas('bookings')->orWhereHas('carBookings')->exists())){
+                    $user->delete();
+                }
             });
+            Cache::forget('agent_record');
             session()->flash('success', 'Agent has been deleted successfully');
             return response()->json(['success' => 1]);
         }
@@ -340,9 +344,10 @@ class AgentController extends Controller
             $user = Agent::where('id', $id)->firstOr(function () {
                 throw new \Exception('User not found!');
             });
-
-            UserAllRecordDeleteJob::dispatch($user);
-            $user->forceDelete();
+            if(!$user->companies->isEmpty() && !($user->companies()->whereHas('bookings')->orWhereHas('carBookings')->exists())){
+                $user->delete();
+            }
+            Cache::forget('agent_record');
             return redirect()->route('admin.agentss')->with('success', 'User Account Deleted Successfully.');
 
         } catch (\Exception $exp) {
@@ -431,16 +436,16 @@ class AgentController extends Controller
 
     public function companiesSearch(Request $request, Agent $agent)
     {
+        try{
 
-        $search = $request->search['value'];
+            $search = $request->search['value'];
 
-        $users = Company::query()
+            $companies = Company::query()
             ->whereBelongsTo($agent)
             ->when(isset($search), function ($query) use ($search) {
                 $query->where('name', 'LIKE', "%{$search}%");
             });
-
-        return DataTables::of($users)
+            return DataTables::of($companies)
             ->addColumn('no', function ($item) {
                 static $counter = 1;
                 $counter++;
@@ -449,7 +454,7 @@ class AgentController extends Controller
             ->addColumn('name', function ($item) {
                 return $item->name;
             })
-            ->addColumn('pakcages', function ($item) {
+            ->addColumn('packages', function ($item) {
                 return $item->packages()?->count() ?? 'N/A';
             })
             ->addColumn('country', function ($item) {
@@ -457,8 +462,12 @@ class AgentController extends Controller
             })
             ->addColumn('date-time' , function ($item) {
                 return $item->created_at->format('d M, Y h:i A');
-            })
+            })->rawColumns(['no', 'name', 'packages', 'country', 'date-time'])
             ->make(true);
+        }catch(Exception $exp){
+            dd($exp);
+        }
+
     }
 
 

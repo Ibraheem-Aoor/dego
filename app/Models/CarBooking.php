@@ -3,16 +3,18 @@
 namespace App\Models;
 
 use App\Interface\DepositableInterface;
+use App\Interface\NotifableUsers;
 use App\Models\Scopes\BelongsToCompanyScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Str;
 
-class CarBooking extends Model implements DepositableInterface
+class CarBooking extends Model implements DepositableInterface  , NotifableUsers
 {
     use HasFactory;
 
@@ -137,8 +139,23 @@ class CarBooking extends Model implements DepositableInterface
     }
     public function getActionLinkForAdmin()
     {
-        // return route();  
+        // return route();
     }
 
 
+    /**
+     * Return the list of companies that have booking and will be notified.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company>
+     */
+    public static function getNotifableUsers(): Collection
+    {
+        $comapny_ids = self::query()->pluck('company_id');
+        $companies = Company::select(['id', 'name' , 'email'])->whereIn('id', $comapny_ids)->get();
+        $companies = $companies->map(function (Company $company) {
+            $company->notifable_type = Company::class;
+            return $company;
+        });
+        return $companies;
+    }
 }

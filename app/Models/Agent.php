@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Traits\AdminLayerTrait;
 use App\Traits\HasLastSeenAttribute;
-use App\Traits\HasProfilePicture;
 use App\Traits\Notify;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,7 +41,7 @@ class Agent extends Authenticatable
     {
         parent::boot();
         static::deleted(function (Agent $agent) {
-            $agent->companies()->delete();
+            $agent->companies()->update(['deleted_at' =>now()]);
         });
     }
 

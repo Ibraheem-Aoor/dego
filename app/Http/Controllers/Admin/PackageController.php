@@ -9,6 +9,7 @@ use App\Models\Destination;
 use App\Models\GoogleMapApi;
 use App\Models\Package;
 use App\Models\PackageCategory;
+use App\Models\Scopes\BelongsToCompanyScope;
 use App\Models\State;
 use App\Traits\Notify;
 use App\Traits\Upload;
@@ -152,6 +153,9 @@ class PackageController extends BaseAdminController
             ->addColumn('create-at', function ($item) {
                 return dateTime($item->created_at);
             })
+            ->addColumn('company', function ($item) {
+                return $item->company?->name;
+            })
             ->addColumn('action', function ($item) {
                 $editUrl = route('admin.package.edit', $item->id);
                 $statusUrl = route('admin.package.status', $item->id);
@@ -208,7 +212,8 @@ class PackageController extends BaseAdminController
     public function add()
     {
         $data['categories'] = PackageCategory::select('id', 'name')->where('status', 1)->get();
-        $data['destinations'] = Destination::select('id', 'title')->where('status', 1)->orderBy('title','ASC')->get();
+        $data['destinations'] = Destination::query()->withoutGlobalScope(BelongsToCompanyScope::class)->select('id', 'title')->where('status', 1)->orderBy('title','ASC')->get();
+
 
         return view('admin.package.add', $data);
     }
@@ -244,7 +249,7 @@ class PackageController extends BaseAdminController
             $thumbData = $this->handleFileUpload($request->file('thumb'), 'package_thumb');
 
             $apiKey = $this->getGoogleApiKey();
-            $destination = Destination::where('id', $request->destination_id)->firstOr(function () {
+            $destination = Destination::query()->withoutGlobalScope(BelongsToCompanyScope::class)->where('id', $request->destination_id)->firstOr(function () {
                 throw new \Exception('Destination not found.');
             });
 

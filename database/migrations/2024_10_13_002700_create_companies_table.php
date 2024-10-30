@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone', 191)->nullable();
             $table->unsignedBigInteger('agent_id');
-            $table->foreign('agent_id')->references('id')->on('agents')->cascadeOnDelete();
             $table->string('image')->nullable();
             $table->string('image_driver',50)->nullable();
             $table->string('password');

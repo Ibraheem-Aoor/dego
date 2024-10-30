@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-
+use App\Models\Admin;
 use App\Models\Booking;
 use App\Models\CarBooking;
 use App\Models\Deposit;
@@ -12,6 +12,7 @@ use App\Models\Package;
 use App\Models\Transaction;
 use App\Traits\Notify;
 use GPBMetadata\Google\Api\Auth;
+use Illuminate\Support\Facades\Log;
 
 class BasicService
 {
@@ -33,6 +34,7 @@ class BasicService
     public function preparePaymentUpgradation($deposit)
     {
         try {
+            $notifable_users = $this->getNotifableUsers($deposit);
             if ($deposit->status == 0 || $deposit->status == 2) {
                 $deposit->status = 1;
                 $deposit->save();
@@ -75,18 +77,25 @@ class BasicService
                         "link" => "#",
                         "icon" => "fas fa-ticket-alt text-white"
                     ];
-
-                    $this->adminMail('BOOKING_REQUEST_SEND_ADMIN', $params, $action);
-                    $this->adminPushNotification('BOOKING_REQUEST_SEND_ADMIN', $params, $actionAdmin);
-                    $this->adminFirebasePushNotification('BOOKING_REQUEST_SEND_ADMIN', $params);
+                    $notifable_users = $this->getNotifableUsers($deposit);
+                    $this->adminMail('BOOKING_REQUEST_SEND_ADMIN', $params, $action , notifiables:$notifable_users);
+                    $this->adminPushNotification('BOOKING_REQUEST_SEND_ADMIN', $params, $actionAdmin , notiables:$notifable_users);
+                    $this->adminFirebasePushNotification('BOOKING_REQUEST_SEND_ADMIN', $params , notiables:$notifable_users);
                 }
 
                 return true;
             }
         } catch (\Exception $e) {
+            Log::error('ERROR IN preparePaymentUpgradation: ' . $e->getMessage());
+            dd($e);
         }
+    }
 
-
+    private function getNotifableUsers(Deposit $deposit)
+    {
+        $admins = Admin::getNotifableUsers();
+        $users = $deposit->depositable->getNotifableUsers();
+        return collect($admins)->merge($users);
     }
 
     public function cryptoQR($wallet, $amount, $crypto = null)

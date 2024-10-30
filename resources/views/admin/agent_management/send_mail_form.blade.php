@@ -48,8 +48,8 @@
     </div>
 
     {{-- @include('admin.user_management.components.login_as_user')
-    @include('admin.user_management.components.update_balance_modal')
-    @include('admin.user_management.components.block_profile_modal') --}}
+    @include('admin.user_management.components.update_balance_modal') --}}
+    @include('admin.agent_management.components.block_profile_modal')
 
 @endsection
 

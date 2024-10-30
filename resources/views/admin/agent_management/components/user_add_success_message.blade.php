@@ -16,14 +16,14 @@
                         <div class="mb-4">
                             <h2>@lang("Successful")</h2>
                             <p>@lang("New") <span
-                                    class="fw-semibold text-dark">@lang($user->firstname . ' ' .$user->lastname )</span> @lang("user has been successfully
+                                    class="fw-semibold text-dark">@lang($user->name )</span> @lang("user has been successfully
                                 created.")</p>
                         </div>
                         <div class="d-flex justify-content-center">
-                            <a class="btn btn-white me-3" href="{{ route('admin.agents.add') }}">
+                            <a class="btn btn-white me-3" href="{{ route('admin.agents.index') }}">
                                 <i class="bi-chevron-left ms-1"></i> @lang("Back to Agents")
                             </a>
-                            <a class="btn btn-primary" href="{{ route('admin.agents.index') }}">
+                            <a class="btn btn-primary" href="{{ route('admin.agents.add') }}">
                                 <i class="bi-person-plus-fill me-1"></i> @lang("Add new Agent")
                             </a>
                         </div>
