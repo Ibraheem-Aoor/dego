@@ -103,5 +103,8 @@ class BasicService
         $cryptoQr = $wallet . "?amount=" . $amount;
         return "https://quickchart.io/chart?cht=qr&chl=$cryptoQr";
     }
+
+
     
+
 }
