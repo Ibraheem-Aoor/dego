@@ -88,7 +88,7 @@ class DashboardController extends Controller
 
     public function saveToken(Request $request)
     {
-        $admin = Auth::guard('company')->user()
+        $admin = Auth::guard('agent')
             ->fireBaseToken()
             ->create([
                 'token' => $request->token,

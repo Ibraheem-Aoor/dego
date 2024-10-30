@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\AdminLayerTrait;
 use App\Traits\HasLastSeenAttribute;
 use App\Traits\HasProfilePicture;
 use App\Traits\Notify;
@@ -15,7 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Agent extends Authenticatable
 {
-    use HasFactory, Notifiable, Notify , SoftDeletes , HasProfilePicture , HasLastSeenAttribute;
+    use HasFactory, Notifiable, Notify , SoftDeletes  , HasLastSeenAttribute , AdminLayerTrait;
     protected $fillable = [
         'name',
         'username',
@@ -52,11 +53,6 @@ class Agent extends Authenticatable
 
 
 
-    public function sendPasswordResetNotification($token)
-    {
-        $this->mail($this, 'PASSWORD_RESET', $params = [
-            'message' => '<a href="' . url('agent/password/reset', $token) . '?email=' . $this->email . '" target="_blank">Click To Reset Password</a>'
-        ]);
-    }
+
 
 }

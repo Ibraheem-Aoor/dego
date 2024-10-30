@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enum\DriverDestinationEnum;
+use App\Traits\AdminLayerTrait;
 use App\Traits\HasLastSeenAttribute;
 use App\Traits\HasProfilePicture;
 use App\Traits\Notify;
@@ -18,7 +19,7 @@ use Illuminate\Http\Request;
 
 class Driver extends  Authenticatable
 {
-    use HasFactory, Notifiable, Notify, SoftDeletes, HasProfilePicture, HasLastSeenAttribute;
+    use HasFactory, Notifiable, Notify, SoftDeletes, HasLastSeenAttribute , AdminLayerTrait;
     protected $fillable = [
         'thumb',
         'thumb_driver',
