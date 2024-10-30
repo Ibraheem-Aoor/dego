@@ -356,7 +356,7 @@
                     <small class="bi-three-dots nav-subtitle-replacer"></small>
                     <div id="navbarVerticalThemeMenu">
 
-                        <div class="nav-item">
+                        <div class="nav-item d-none">
                             <a class="nav-link {{ menuActive(['admin.template.all']) }}"
                                href="{{ route('admin.template.all') }}"
                                data-placement="left">

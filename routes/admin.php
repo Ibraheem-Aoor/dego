@@ -78,10 +78,10 @@ Route::get('schedule-run', function () {
 
 $basicControl = basicControl();
 Route::group(['prefix' => $basicControl->admin_prefix ?? 'admin', 'as' => 'admin.'], function () {
-    Route::get('/themeMode/{themeType?}', function ($themeType = 'true') {
-        session()->put('themeMode', $themeType);
-        return $themeType;
-    })->name('themeMode');
+    // Route::get('/themeMode/{themeType?}', function ($themeType = 'true') {
+    //     session()->put('themeMode', $themeType);
+    //     return $themeType;
+    // })->name('themeMode');
 
     /*== Authentication Routes ==*/
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest:admin');
